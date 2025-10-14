@@ -1,0 +1,23 @@
+/* Styles for DashboardPage Component */
+
+.container {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1.5rem;
+}
+
+.content {
+  color: #495057;
+  line-height: 1.6;
+}
