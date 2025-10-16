@@ -15,6 +15,7 @@
     "@mantine/dates": "^7.10.1",
     "@mantine/hooks": "^7.10.1",
     "@next/env": "^15.5.3",
+    "axios": "^1.7.2",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.11",
     "lucide-react": "^0.542.0",

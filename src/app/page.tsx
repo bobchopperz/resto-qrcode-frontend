@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import {
@@ -34,9 +35,8 @@ export default function Home() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
-        const data = await response.json();
-        setMenu(data);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
+        setMenu(response.data);
       } catch (error) {
         console.error("Failed to fetch menu:", error);
       }
@@ -113,20 +113,7 @@ export default function Home() {
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'No error details from server.' }));
-        console.error("Backend error:", errorData);
-        alert(`Gagal mengirim pesanan. Status: ${response.status}. Silakan coba lagi.`);
-        return;
-      }
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order`, orderData);
 
       alert("Sipp Kakak! Pesananmu sudah kami terima dan sedang diproses.");
 
@@ -137,7 +124,12 @@ export default function Home() {
 
     } catch (error) {
       console.error("Failed to submit order:", error);
-      alert('Terjadi kesalahan saat mengirim pesanan. Silakan coba lagi.');
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Backend error:", error.response.data);
+        alert(`Gagal mengirim pesanan. Status: ${error.response.status}. Silakan coba lagi.`);
+      } else {
+        alert('Terjadi kesalahan saat mengirim pesanan. Silakan coba lagi.');
+      }
     } finally {
         setIsSubmitting(false);
     }
