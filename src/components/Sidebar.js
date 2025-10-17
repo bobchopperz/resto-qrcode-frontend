@@ -3,16 +3,14 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
-import { ChevronLeft, LayoutDashboard, ClipboardList, BarChart2, Salad, LogOut, Users } from 'lucide-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Path impor diperbaiki di sini
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { ChevronLeft, LayoutDashboard, ClipboardList, BarChart2, Salad, LogOut, Users, MessageCircleReply } from 'lucide-react';
 
 // Daftar menu untuk sidebar
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { href: '/dashboard/menu', label: 'Menu', icon: <ClipboardList size={20} /> },
   { href: '/dashboard/sales', label: 'Penjualan', icon: <BarChart2 size={20} /> },
-  { href: '/dashboard/whatsapp', label: 'Whatsapp', icon: <FontAwesomeIcon icon={faWhatsapp} size="lg" /> },
+  { href: '/dashboard/whatsapp', label: 'Whatsapp', icon: <MessageCircleReply size={20} /> },
   { href: '/dashboard/users', label: 'User', icon: <Users size={20} /> }, // Label diubah menjadi 'User'
 ];
 
