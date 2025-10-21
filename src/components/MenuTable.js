@@ -114,7 +114,7 @@ export default function MenuTable() {
                     <div className={styles.imageCell}>
                       <button
                         className={`${styles.actionButton} ${styles.showButton}`}
-                        onClick={() => setImageToShow(`${process.env.NEXT_PUBLIC_EXTERNAL_APACHE}${item.imageUrl}`)}
+                        onClick={() => setImageToShow(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${item.imageUrl}`)}
                       >
                         <Camera size={16} />
                       </button>

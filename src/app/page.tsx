@@ -157,12 +157,12 @@ export default function Home() {
                 return (
                   <div key={item._id} className="group relative rounded-lg shadow-lg overflow-hidden h-96">
                     <img 
-                      src={`${process.env.NEXT_PUBLIC_EXTERNAL_APACHE}${item.imageUrl}`}
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${item.imageUrl}`}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
                     <div 
-                      onClick={() => setImageToZoom(`${process.env.NEXT_PUBLIC_EXTERNAL_APACHE}${item.imageUrl}`)}
+                      onClick={() => setImageToZoom(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${item.imageUrl}`)}
                       className="absolute inset-0 z-10 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                     >
                       <p className="text-white font-semibold">Klik untuk perbesar</p>
