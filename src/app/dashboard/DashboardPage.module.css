@@ -9,7 +9,7 @@
 
 .title {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 350; /* Diubah dari 600 menjadi 350 */
   color: #333;
   margin: 0;
   padding-bottom: 1rem;
@@ -20,4 +20,12 @@
 .content {
   color: #495057;
   line-height: 1.6;
+}
+
+/* --- Mobile Styles --- */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
 }

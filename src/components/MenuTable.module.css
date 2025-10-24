@@ -325,3 +325,16 @@
   background-color: #94d3a2;
   cursor: not-allowed;
 }
+
+/* --- Mobile Styles --- */
+@media (max-width: 768px) {
+  .header {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .addButton {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.8rem;
+  }
+}
