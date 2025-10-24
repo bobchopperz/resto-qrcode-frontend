@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // Impor useRef
 import styles from './MenuTable.module.css';
-import { X } from 'lucide-react';
+import { X, Camera } from 'lucide-react'; // Impor Camera
 
 export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem }) {
   const [name, setName] = useState('');
@@ -12,6 +12,7 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
   const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const fileInputRef = useRef(null); // Ref untuk input file
 
   useEffect(() => {
     if (isOpen && menuItem) {
@@ -19,7 +20,7 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
       setDescription(menuItem.description || '');
       setModal(menuItem.modal || '');
       setPrice(menuItem.price || '');
-      setImageFile(null); // Reset image file when opening for edit
+      setImageFile(null);
       setError(null);
     }
   }, [isOpen, menuItem]);
@@ -37,7 +38,7 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
     formData.append('modal', modal);
     formData.append('price', price);
     if (imageFile) {
-      formData.append('imageFile', imageFile); // Diubah dari 'image' menjadi 'imageFile'
+      formData.append('imageFile', imageFile);
     }
 
     try {
@@ -56,7 +57,7 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
       onClose();
     } catch (err) {
       setError(err.message);
-      alert(`Gagal memperbarui menu: ${err.message}`); // Menampilkan alert untuk error
+      alert(`Gagal memperbarui menu: ${err.message}`);
       console.error('Error updating menu:', err);
     } finally {
       setIsSubmitting(false);
@@ -74,54 +75,38 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
           {error && <p className={styles.errorMessage}>{error}</p>}
           <div className={styles.formGroup}>
             <label htmlFor="name">Nama Menu</label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="description">Deskripsi</label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            ></textarea>
+            <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required></textarea>
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="modal">Modal (Rp)</label>
-            <input
-              type="number"
-              id="modal"
-              value={modal}
-              onChange={(e) => setModal(e.target.value)}
-              required
-              min="0"
-            />
+            <input type="number" id="modal" value={modal} onChange={(e) => setModal(e.target.value)} required min="0" />
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="price">Harga Jual (Rp)</label>
-            <input
-              type="number"
-              id="price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-              min="0"
-            />
+            <input type="number" id="price" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="image">Gambar Menu (kosongkan jika tidak ingin mengubah)</label>
-            <input
-              type="file"
-              id="image"
-              accept="image/jpeg,image/png"
-              onChange={(e) => setImageFile(e.target.files[0])}
-            />
-            <p className={styles.imageHint}>Gambar landscape ratio 4:3 (jpg, jpeg, png)</p>
+            <label>Gambar Menu</label>
+            <div className={styles.imageUploadContainer}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className={styles.hiddenFileInput}
+                accept="image/jpeg,image/png"
+                onChange={(e) => setImageFile(e.target.files[0])}
+              />
+              <button type="button" className={styles.cameraButton} onClick={() => fileInputRef.current.click()}>
+                <Camera size={20} />
+              </button>
+              <span className={styles.fileName}>
+                {imageFile ? imageFile.name : "Pilih gambar baru..."}
+              </span>
+            </div>
+            <p className={styles.imageHint}>Kosongkan jika tidak ingin mengubah. Gambar landscape ratio 4:3 (jpg, jpeg, png), maksimal 10 MB.</p>
           </div>
           <div className={styles.formActions}>
             <button type="button" onClick={onClose} className={styles.cancelButton} disabled={isSubmitting}>Batal</button>
