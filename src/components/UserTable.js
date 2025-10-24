@@ -24,7 +24,7 @@ export default function UserTable() {
         },
       });
       if (!response.ok) {
-        throw new Error(`Gagal mengambil data pengguna. Status: ${response.status}`);
+        throw new Error(`Gagal mengambil data user. Status: ${response.status}`);
       }
       const data = await response.json();
       setUsers(data);
@@ -50,7 +50,7 @@ export default function UserTable() {
   };
 
   const handleDelete = async (userId) => {
-    if (window.confirm('Apakah Kakak yakin ingin menghapus pengguna ini?')) {
+    if (window.confirm('Apakah Kakak yakin ingin menghapus user ini?')) {
       try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/user/${userId}`, {
@@ -61,14 +61,14 @@ export default function UserTable() {
         });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: 'Gagal menghapus pengguna.' }));
+          const errorData = await response.json().catch(() => ({ message: 'Gagal menghapus user.' }));
           throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
         }
 
-        alert('Pengguna berhasil dihapus!');
-        fetchUsers(); // Refresh daftar pengguna
+        alert('User berhasil dihapus!');
+        fetchUsers(); // Refresh daftar user
       } catch (err) {
-        alert(`Gagal menghapus pengguna: ${err.message}`);
+        alert(`Gagal menghapus user: ${err.message}`);
         console.error('Error deleting user:', err);
       }
     }
@@ -81,14 +81,14 @@ export default function UserTable() {
   return (
     <div className={styles.tableContainer}>
       <div className={styles.header}>
-        <h1>Daftar Pengguna</h1>
+        <h1>Daftar User</h1>
         <button className={styles.addButton} onClick={handleAddClick}>
           <Plus size={18} />
-          <span>Tambah Pengguna</span>
+          <span>Tambah User</span>
         </button>
       </div>
       {isLoading ? (
-        <p>Memuat data pengguna...</p>
+        <p>Memuat data user...</p>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -127,7 +127,7 @@ export default function UserTable() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" style={{ textAlign: 'center' }}>Belum ada pengguna.</td>
+                  <td colSpan="4" style={{ textAlign: 'center' }}>Belum ada user.</td>
                 </tr>
               )}
             </tbody>
@@ -135,7 +135,7 @@ export default function UserTable() {
         </div>
       )}
 
-      {/* Modals untuk Tambah dan Edit Pengguna */}
+      {/* Modals untuk Tambah dan Edit User */}
       <AddUserModal 
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 

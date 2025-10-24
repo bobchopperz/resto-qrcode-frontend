@@ -52,16 +52,16 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Gagal memperbarui pengguna.' }));
+        const errorData = await response.json().catch(() => ({ message: 'Gagal memperbarui user.' }));
         throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       }
 
-      alert('Pengguna berhasil diperbarui!');
+      alert('User berhasil diperbarui!');
       onUserUpdated();
       onClose();
     } catch (err) {
       setError(err.message);
-      alert(`Gagal memperbarui pengguna: ${err.message}`);
+      alert(`Gagal memperbarui user: ${err.message}`);
       console.error('Error updating user:', err);
     } finally {
       setIsSubmitting(false);
@@ -72,7 +72,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
     <div className={styles.modalBackdrop} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h2>Edit Pengguna</h2>
+          <h2>Edit User</h2>
           <button className={styles.modalCloseButton} onClick={onClose}><X size={20} /></button>
         </div>
         <form onSubmit={handleSubmit} className={styles.userForm}>
@@ -120,7 +120,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
           <div className={styles.formActions}>
             <button type="button" onClick={onClose} className={styles.cancelButton} disabled={isSubmitting}>Batal</button>
             <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-              {isSubmitting ? 'Memperbarui...' : 'Perbarui Pengguna'}
+              {isSubmitting ? 'Memperbarui...' : 'Perbarui User'}
             </button>
           </div>
         </form>

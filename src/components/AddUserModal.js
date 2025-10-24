@@ -36,11 +36,11 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Gagal menambahkan pengguna.' }));
+        const errorData = await response.json().catch(() => ({ message: 'Gagal menambahkan user.' }));
         throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       }
 
-      alert('Pengguna berhasil ditambahkan!');
+      alert('User berhasil ditambahkan!');
       onUserAdded(); // Beri tahu parent untuk refresh data
       onClose(); // Tutup modal
       // Reset form
@@ -50,7 +50,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
       setRole('user');
     } catch (err) {
       setError(err.message);
-      alert(`Gagal menambahkan pengguna: ${err.message}`);
+      alert(`Gagal menambahkan user: ${err.message}`);
       console.error('Error adding user:', err);
     } finally {
       setIsSubmitting(false);
@@ -61,7 +61,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
     <div className={styles.modalBackdrop} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h2>Tambah Pengguna Baru</h2>
+          <h2>Tambah User Baru</h2>
           <button className={styles.modalCloseButton} onClick={onClose}><X size={20} /></button>
         </div>
         <form onSubmit={handleSubmit} className={styles.userForm}>
@@ -110,7 +110,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
           <div className={styles.formActions}>
             <button type="button" onClick={onClose} className={styles.cancelButton} disabled={isSubmitting}>Batal</button>
             <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-              {isSubmitting ? 'Menyimpan...' : 'Simpan Pengguna'}
+              {isSubmitting ? 'Menyimpan...' : 'Simpan User'}
             </button>
           </div>
         </form>
