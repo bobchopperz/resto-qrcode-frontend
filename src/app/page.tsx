@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import axios from "axios";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
@@ -17,7 +17,7 @@ interface MenuItem {
   description: string;
   price: number;
   imageUrl: string;
-  stok: number; // Tambahkan stok
+  stok: number;
 }
 
 interface CartItem extends MenuItem {
@@ -33,26 +33,25 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageToZoom, setImageToZoom] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
-        setMenu(response.data);
-      } catch (error) {
-        console.error("Failed to fetch menu:", error);
-      }
-    };
-
-    fetchMenu();
+  const fetchMenu = useCallback(async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
+      setMenu(response.data);
+    } catch (error) {
+      console.error("Failed to fetch menu:", error);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
+
   const handleAddToCart = (item: MenuItem) => {
-    if (item.stok <= 0) return; // Jangan tambahkan jika stok habis
+    if (item.stok <= 0) return;
 
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem._id === item._id);
       if (existingItem) {
-        // Pastikan tidak melebihi stok
         if (existingItem.quantity < item.stok) {
           return prevCart.map((cartItem) =>
             cartItem._id === item._id
@@ -60,7 +59,7 @@ export default function Home() {
               : cartItem
           );
         }
-        return prevCart; // Jika sudah mencapai batas stok, jangan ubah
+        return prevCart;
       } else {
         return [...prevCart, { ...item, quantity: 1 }];
       }
@@ -73,7 +72,6 @@ export default function Home() {
         .map((item) => {
           if (item._id === itemId) {
             const newQuantity = item.quantity + amount;
-            // Pastikan tidak melebihi stok saat menambah
             if (newQuantity > item.stok) {
               alert(`Maaf, stok untuk ${item.name} hanya tersisa ${item.stok}.`);
               return item;
@@ -129,6 +127,9 @@ export default function Home() {
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order`, orderData);
 
       alert("Sipp Kakak! Pesananmu sudah kami terima dan sedang diproses.");
+
+      // Ambil data menu terbaru untuk update stok
+      fetchMenu();
 
       setIsModalOpen(false);
       setCart([]);
