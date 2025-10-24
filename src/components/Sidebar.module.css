@@ -157,3 +157,116 @@
   display: flex;
   min-height: 100vh;
 }
+
+/* --- Mobile Styles --- */
+/* Hide hamburger on desktop */
+.mobileMenuButton {
+  display: none;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+}
+
+/* Media Query for mobile devices */
+@media (max-width: 768px) {
+  /* --- Sidebar becomes a top bar --- */
+  .sidebar {
+    width: 100%;
+    height: 60px; /* Fixed height for the top bar */
+    flex-direction: row;
+    bottom: auto;
+    top: 0;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    overflow: hidden; /* Hide overflowing content */
+  }
+
+  /* When mobile menu is open, expand its height to fill the screen */
+  .sidebar.mobileMenuOpen {
+    height: 100vh;
+    overflow: auto; /* Allow scrolling if content is long */
+  }
+
+  /* Ignore the collapsed state on mobile */
+  .sidebar.collapsed {
+    width: 100%;
+  }
+
+  /* --- Header adjustments --- */
+  .sidebarHeader {
+    width: 100%;
+    height: 60px; /* Match sidebar height */
+    padding: 0 1rem;
+    border-bottom: none;
+  }
+
+  /* Hide the desktop toggle button */
+  .toggleButton {
+    display: none;
+  }
+
+  /* Show the mobile hamburger button */
+  .mobileMenuButton {
+    display: block;
+  }
+
+  /* Adjust logo container */
+  .logoContainer {
+    justify-content: center;
+    flex-grow: 1;
+  }
+  .sidebar.collapsed .logoText, .logoText {
+    display: inline-block; /* Always show logo text */
+  }
+
+  /* --- Navigation Wrapper --- */
+  /* This contains the nav and logout button */
+  .navWrapper {
+    display: none; /* Hide the menu by default */
+    width: 100%;
+    background-color: #ffffff;
+    padding-top: 1rem;
+  }
+
+  /* Show the menu when the accordion is open */
+  .sidebar.mobileMenuOpen .navWrapper {
+    display: block;
+  }
+
+  /* --- Main Content Area --- */
+  /* Adjust margin-top to push content below the top bar */
+  .mainContent,
+  .mainContent.mainCollapsed {
+    margin-left: 0;
+    margin-top: 60px; /* Height of the top bar */
+    width: 100%;
+    padding: 1rem;
+  }
+
+  /* --- Other adjustments --- */
+  .sidebarMain {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebarNav {
+    padding-top: 0;
+  }
+
+  .sidebarFooter {
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .menuLink {
+    justify-content: flex-start;
+    padding: 0.9rem 1.5rem;
+  }
+  .sidebar.collapsed .menuLink {
+    justify-content: flex-start;
+  }
+  .sidebar.collapsed .menuLabel {
+    display: inline;
+  }
+}
