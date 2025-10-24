@@ -17,7 +17,7 @@ export default function UserTable() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('accessToken'); // Diubah dari 'token' menjadi 'accessToken'
+      const token = localStorage.getItem('accessToken');
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/user`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -52,7 +52,7 @@ export default function UserTable() {
   const handleDelete = async (userId) => {
     if (window.confirm('Apakah Kakak yakin ingin menghapus pengguna ini?')) {
       try {
-        const token = localStorage.getItem('accessToken'); // Diubah dari 'token' menjadi 'accessToken'
+        const token = localStorage.getItem('accessToken');
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/user/${userId}`, {
           method: 'DELETE',
           headers: {
@@ -90,47 +90,49 @@ export default function UserTable() {
       {isLoading ? (
         <p>Memuat data pengguna...</p>
       ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Nama</th>
-              <th>Role</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length > 0 ? (
-              users.map((user) => (
-                <tr key={user._id}>
-                  <td data-label="Username">{user.username}</td>
-                  <td data-label="Nama">{user.name}</td>
-                  <td data-label="Role">{user.role}</td>
-                  <td data-label="Aksi">
-                    <div className={styles.actionButtons}>
-                      <button 
-                        className={`${styles.actionButton} ${styles.editButton}`}
-                        onClick={() => handleEditClick(user)}
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button 
-                        className={`${styles.actionButton} ${styles.deleteButton}`}
-                        onClick={() => handleDelete(user._id)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
               <tr>
-                <td colSpan="4" style={{ textAlign: 'center' }}>Belum ada pengguna.</td>
+                <th>Username</th>
+                <th>Nama</th>
+                <th>Role</th>
+                <th>Aksi</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.length > 0 ? (
+                users.map((user) => (
+                  <tr key={user._id}>
+                    <td data-label="Username">{user.username}</td>
+                    <td data-label="Nama">{user.name}</td>
+                    <td data-label="Role">{user.role}</td>
+                    <td data-label="Aksi">
+                      <div className={styles.actionButtons}>
+                        <button 
+                          className={`${styles.actionButton} ${styles.editButton}`}
+                          onClick={() => handleEditClick(user)}
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          className={`${styles.actionButton} ${styles.deleteButton}`}
+                          onClick={() => handleDelete(user._id)}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" style={{ textAlign: 'center' }}>Belum ada pengguna.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Modals untuk Tambah dan Edit Pengguna */}

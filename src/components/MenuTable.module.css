@@ -6,6 +6,12 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
+/* New wrapper for horizontal scrolling */
+.tableWrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
 /* Header section with title and add button */
 .header {
   display: flex;
@@ -48,7 +54,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
-    color: #495057;
+  color: #495057;
 }
 
 .table th, .table td {
@@ -56,6 +62,7 @@
   text-align: left;
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle; /* Vertically align content */
+  white-space: nowrap; /* Prevent text from wrapping */
 }
 
 .table th {

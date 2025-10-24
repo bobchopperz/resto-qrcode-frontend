@@ -53,24 +53,26 @@ function DailyDetailModal({ dayData, onClose }) {
 
               {openAccordionId === transaction._id && (
                 <div className={styles.accordionContent}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th className={styles.th}>Menu</th>
-                        <th className={styles.th}>Kuantiti</th>
-                        <th className={styles.th}>Sub-Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transaction.orders.map((order, index) => (
-                        <tr key={index}>
-                          <td className={styles.td}>{order.name}</td>
-                          <td className={styles.td}>{order.kuantiti}</td>
-                          <td className={styles.td}>{formatRupiah(order.sub_total)}</td>
+                  <div className={styles.modalTableWrapper}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <th className={styles.th}>Menu</th>
+                          <th className={styles.th}>Kuantiti</th>
+                          <th className={styles.th}>Sub-Total</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {transaction.orders.map((order, index) => (
+                          <tr key={index}>
+                            <td className={styles.td}>{order.name}</td>
+                            <td className={styles.td}>{order.kuantiti}</td>
+                            <td className={styles.td}>{formatRupiah(order.sub_total)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
@@ -167,28 +169,30 @@ function DailySalesContent() {
       {isLoading ? (
         <p style={{textAlign: 'center', margin: '2rem'}}>Memuat data ...</p>
       ) : (
-        <ul className={styles.list}>
-            <li className={`${styles.listItem} ${styles.dateText} ${styles.liHeader}`}>
-                <span>Tanggal</span>
-                <span>Total Margin</span>
-                <span>Total Penjualan</span>
-                <span></span>
-            </li>
-            {aggregatedData.length > 0 ? (
-                aggregatedData.map((day) => (
-                <li key={day.date} className={styles.listItem}>
-                    <span className={styles.dateText}>{day.formattedDate}</span>
-                    <span className={styles.marginText}>{formatRupiah(day.totalMargin)}</span>
-                    <span className={styles.totalText}>{formatRupiah(day.totalSales)}</span>
-                    <button className={styles.button} onClick={() => setSelectedDay(day)}>
-                    Rincian
-                    </button>
-                </li>
-                ))
-            ) : (
-                <p style={{textAlign: 'center', margin: '2rem'}}>Tidak ada data untuk periode ini.</p>
-            )}
-        </ul>
+        <div className={styles.listWrapper}>
+          <ul className={styles.list}>
+              <li className={`${styles.listItem} ${styles.dateText} ${styles.liHeader}`}>
+                  <span>Tanggal</span>
+                  <span>Total Margin</span>
+                  <span>Total Penjualan</span>
+                  <span></span>
+              </li>
+              {aggregatedData.length > 0 ? (
+                  aggregatedData.map((day) => (
+                  <li key={day.date} className={styles.listItem}>
+                      <span className={styles.dateText}>{day.formattedDate}</span>
+                      <span className={styles.marginText}>{formatRupiah(day.totalMargin)}</span>
+                      <span className={styles.totalText}>{formatRupiah(day.totalSales)}</span>
+                      <button className={styles.button} onClick={() => setSelectedDay(day)}>
+                      Rincian
+                      </button>
+                  </li>
+                  ))
+              ) : (
+                  <p style={{textAlign: 'center', margin: '2rem'}}>Tidak ada data untuk periode ini.</p>
+              )}
+          </ul>
+        </div>
       )}
 
       <DailyDetailModal 

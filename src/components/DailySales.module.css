@@ -24,7 +24,7 @@
   margin-bottom: 1.5rem;
   align-items: center;
   position: relative;
-  color: dimgrey; /* Reverted */
+  color: dimgrey;
 }
 
 .controlsContainer select {
@@ -35,7 +35,6 @@
   font-size: 0.9rem;
 }
 
-/* NEW: Styles for the custom month picker button */
 .monthPickerButton {
   padding: 0.5rem;
   border-radius: 4px;
@@ -47,7 +46,6 @@
   text-align: left;
 }
 
-/* NEW: Styles for the popover that contains the MonthPicker */
 .monthPickerPopover {
   position: absolute;
   top: 100%;
@@ -59,11 +57,18 @@
   z-index: 10;
 }
 
+/* New wrapper for horizontal scrolling */
+.listWrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
 .list {
   list-style: none;
   padding: 0;
   font-size: 0.95rem;
-  color: #434040; /* Reverted */
+  color: #434040;
+  min-width: 550px; /* Force scroll if needed */
 }
 
 .listItem {
@@ -73,8 +78,9 @@
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid #e9ecef;
-  color: #434040; /* Reverted */
+  color: #434040;
   transition: background-color 0.2s ease;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .listItem:hover {
@@ -122,7 +128,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  color: #434040; /* Reverted */
+  color: #434040;
 }
 .dailyModalContent {
   background-color: white;
@@ -167,7 +173,6 @@
   background: transparent;
   font-size: 1.5rem;
   cursor: pointer;
-  /* color: #666; (Reverted) */
 }
 .modalFooter {
   margin-top: 1.5rem;
@@ -175,6 +180,13 @@
   border-top: 1px solid #e9ecef;
   text-align: right;
 }
+
+/* New wrapper for modal table */
+.modalTableWrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -188,11 +200,27 @@
     font-size: 1.0rem;
     letter-spacing: 0.5px;
 }
+
+.th {
+  background-color: #f8f9fa;
+  color: #41414c;
+  font-weight: 350;
+  font-size: 1.0rem;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
 .td {
   border-bottom: 1px solid #e9ecef;
   padding: 1rem;
   vertical-align: middle;
+  white-space: nowrap;
 }
+
 .transactionItem {
   padding: 0.75rem;
   border: 1px solid #e0e0e0;

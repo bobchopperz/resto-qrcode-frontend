@@ -91,60 +91,62 @@ export default function MenuTable() {
       {isLoading ? (
         <p>Memuat data menu...</p>
       ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Nama Menu</th>
-              <th>Deskripsi</th>
-              <th>Modal</th>
-              <th>Harga</th>
-              <th>Image</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {menuItems.length > 0 ? (
-              menuItems.map((item) => (
-                <tr key={item._id}>
-                  <td data-label="Nama">{item.name}</td>
-                  <td data-label="Deskripsi">{item.description}</td>
-                  <td data-label="Modal">{formatRupiah(item.modal)}</td>
-                  <td data-label="Harga">{formatRupiah(item.price)}</td>
-                  <td data-label="Image">
-                    <div className={styles.imageCell}>
-                      <button
-                        className={`${styles.actionButton} ${styles.showButton}`}
-                        onClick={() => setImageToShow(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${item.imageUrl}`)}
-                      >
-                        <Camera size={16} />
-                      </button>
-                    </div>
-                  </td>
-                  <td data-label="Aksi">
-                    <div className={styles.actionButtons}>
-                      <button 
-                        className={`${styles.actionButton} ${styles.editButton}`}
-                        onClick={() => handleEditClick(item)}
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button 
-                        className={`${styles.actionButton} ${styles.deleteButton}`}
-                        onClick={() => handleDelete(item._id)} // Panggil fungsi handleDelete
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center' }}>Belum ada menu.</td>
+                <th>Nama Menu</th>
+                <th>Deskripsi</th>
+                <th>Modal</th>
+                <th>Harga</th>
+                <th>Image</th>
+                <th>Aksi</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {menuItems.length > 0 ? (
+                menuItems.map((item) => (
+                  <tr key={item._id}>
+                    <td data-label="Nama">{item.name}</td>
+                    <td data-label="Deskripsi">{item.description}</td>
+                    <td data-label="Modal">{formatRupiah(item.modal)}</td>
+                    <td data-label="Harga">{formatRupiah(item.price)}</td>
+                    <td data-label="Image">
+                      <div className={styles.imageCell}>
+                        <button
+                          className={`${styles.actionButton} ${styles.showButton}`}
+                          onClick={() => setImageToShow(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${item.imageUrl}`)}
+                        >
+                          <Camera size={16} />
+                        </button>
+                      </div>
+                    </td>
+                    <td data-label="Aksi">
+                      <div className={styles.actionButtons}>
+                        <button 
+                          className={`${styles.actionButton} ${styles.editButton}`}
+                          onClick={() => handleEditClick(item)}
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          className={`${styles.actionButton} ${styles.deleteButton}`}
+                          onClick={() => handleDelete(item._id)} // Panggil fungsi handleDelete
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center' }}>Belum ada menu.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Modal untuk menampilkan gambar */}
