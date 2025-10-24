@@ -17,6 +17,7 @@ interface MenuItem {
   description: string;
   price: number;
   imageUrl: string;
+  stok: number; // Tambahkan stok
 }
 
 interface CartItem extends MenuItem {
@@ -46,14 +47,20 @@ export default function Home() {
   }, []);
 
   const handleAddToCart = (item: MenuItem) => {
+    if (item.stok <= 0) return; // Jangan tambahkan jika stok habis
+
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem._id === item._id);
       if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem._id === item._id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
+        // Pastikan tidak melebihi stok
+        if (existingItem.quantity < item.stok) {
+          return prevCart.map((cartItem) =>
+            cartItem._id === item._id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          );
+        }
+        return prevCart; // Jika sudah mencapai batas stok, jangan ubah
       } else {
         return [...prevCart, { ...item, quantity: 1 }];
       }
@@ -65,7 +72,13 @@ export default function Home() {
       prevCart
         .map((item) => {
           if (item._id === itemId) {
-            return { ...item, quantity: item.quantity + amount };
+            const newQuantity = item.quantity + amount;
+            // Pastikan tidak melebihi stok saat menambah
+            if (newQuantity > item.stok) {
+              alert(`Maaf, stok untuk ${item.name} hanya tersisa ${item.stok}.`);
+              return item;
+            }
+            return { ...item, quantity: newQuantity };
           }
           return item;
         })
@@ -154,6 +167,9 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
               {menu.map((item) => {
                 const cartItem = cart.find(ci => ci._id === item._id);
+                const isOutOfStock = item.stok <= 0;
+                const isCartMaxed = cartItem ? cartItem.quantity >= item.stok : false;
+
                 return (
                   <div key={item._id} className="group relative rounded-lg shadow-lg overflow-hidden h-96">
                     <img 
@@ -180,14 +196,22 @@ export default function Home() {
                               <Minus size={16} />
                             </button>
                             <span className="font-bold text-lg w-8 text-center text-sky-600">{cartItem.quantity}</span>
-                            <button onClick={() => handleUpdateQuantity(item._id, 1)} className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 transition-colors">
+                            <button 
+                              onClick={() => handleUpdateQuantity(item._id, 1)} 
+                              disabled={isCartMaxed}
+                              className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
                               <Plus size={16} />
                             </button>
                           </div>
                         ) : (
-                          <button onClick={() => handleAddToCart(item)} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
-                            Tambah
-                          </button>
+                          isOutOfStock ? (
+                            <span className="font-semibold text-red-500 bg-red-100 px-4 py-2 rounded-lg">Stok Habis</span>
+                          ) : (
+                            <button onClick={() => handleAddToCart(item)} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                              Tambah
+                            </button>
+                          )
                         )}
                       </div>
                     </div>

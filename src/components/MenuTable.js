@@ -99,6 +99,7 @@ export default function MenuTable() {
                 <th>Deskripsi</th>
                 <th>Modal</th>
                 <th>Harga</th>
+                <th>Stok</th>
                 <th>Image</th>
                 <th>Aksi</th>
               </tr>
@@ -111,6 +112,7 @@ export default function MenuTable() {
                     <td data-label="Deskripsi">{item.description}</td>
                     <td data-label="Modal">{formatRupiah(item.modal)}</td>
                     <td data-label="Harga">{formatRupiah(item.price)}</td>
+                    <td data-label="Stok">{item.stok}</td>
                     <td data-label="Image">
                       <div className={styles.imageCell}>
                         <button
@@ -141,7 +143,7 @@ export default function MenuTable() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center' }}>Belum ada menu.</td>
+                  <td colSpan="7" style={{ textAlign: 'center' }}>Belum ada menu.</td>
                 </tr>
               )}
             </tbody>

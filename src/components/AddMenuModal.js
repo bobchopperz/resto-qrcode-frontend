@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useRef } from 'react'; // Impor useRef
+import { useState, useRef } from 'react';
 import styles from './MenuTable.module.css';
-import { X, Camera } from 'lucide-react'; // Impor Camera
+import { X, Camera } from 'lucide-react';
 
 export default function AddMenuModal({ isOpen, onClose, onMenuAdded }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [modal, setModal] = useState('');
   const [price, setPrice] = useState('');
+  const [stok, setStok] = useState(''); // State baru untuk stok
   const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const fileInputRef = useRef(null); // Ref untuk input file
+  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 
@@ -26,6 +27,7 @@ export default function AddMenuModal({ isOpen, onClose, onMenuAdded }) {
     formData.append('description', description);
     formData.append('modal', modal);
     formData.append('price', price);
+    formData.append('stok', stok); // Tambahkan stok ke form data
     if (imageFile) {
       formData.append('imageFile', imageFile);
     }
@@ -49,6 +51,7 @@ export default function AddMenuModal({ isOpen, onClose, onMenuAdded }) {
       setDescription('');
       setModal('');
       setPrice('');
+      setStok(''); // Reset stok
       setImageFile(null);
     } catch (err) {
       setError(err.message);
@@ -83,6 +86,10 @@ export default function AddMenuModal({ isOpen, onClose, onMenuAdded }) {
           <div className={styles.formGroup}>
             <label htmlFor="price">Harga Jual (Rp)</label>
             <input type="number" id="price" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" />
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="stok">Stok</label>
+            <input type="number" id="stok" value={stok} onChange={(e) => setStok(e.target.value)} required min="0" />
           </div>
           <div className={styles.formGroup}>
             <label>Gambar Menu</label>
