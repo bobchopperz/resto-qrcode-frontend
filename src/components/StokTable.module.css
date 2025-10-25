@@ -72,6 +72,42 @@
   background-color: #f1f3f5;
 }
 
+/* --- Action Buttons --- */
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.editButton {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.editButton:hover {
+  background-color: #e0a800;
+}
+
+.deleteButton {
+  background-color: #dc3545;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #c82333;
+}
+
 /* --- Modal & Form Styles --- */
 .modalBackdrop {
   position: fixed;
@@ -143,6 +179,17 @@
   color: #333;
 }
 
+.dateTimeContainer {
+  display: flex;
+  gap: 0.5rem; /* Perkecil jarak */
+  align-items: center;
+}
+
+.dateTimeContainer select {
+  width: auto; /* Biarkan lebar mengikuti konten */
+  flex-shrink: 0;
+}
+
 .stokForm .formActions {
   display: flex;
   justify-content: flex-end;
@@ -201,5 +248,8 @@
   .addButton {
     font-size: 0.85rem;
     padding: 0.5rem 0.8rem;
+  }
+  .dateTimeContainer {
+    /* Biarkan flex-direction: row agar tetap sejajar jika muat */
   }
 }
