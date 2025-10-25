@@ -22,14 +22,24 @@ export default function EditStokModal({ isOpen, onClose, onStokUpdated, stokItem
 
   useEffect(() => {
     if (isOpen && stokItem) {
+      const timezone = process.env.NEXT_PUBLIC_TIMEZONE || 'Asia/Jakarta';
       const restokDate = new Date(stokItem.tanggal_restok);
+
+      const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: timezone,
+      });
+      const [currentHour, currentMinute] = timeFormatter.format(restokDate).split(':');
+
       setSelectedMenuId(stokItem.menu_id?._id || '');
       setQuantity(stokItem.kuantiti || '');
       setModal(stokItem.modal || '');
       setHargaJual(stokItem.harga_jual || '');
       setTanggalRestok(restokDate);
-      setJam(restokDate.getHours().toString().padStart(2, '0'));
-      setMenit(restokDate.getMinutes().toString().padStart(2, '0'));
+      setJam(currentHour);
+      setMenit(currentMinute);
     }
   }, [isOpen, stokItem]);
 
