@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c1c9f68-7310-49a7-8671-f9f732baf94d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/components/EditStokModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/AddStokModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/AddStokModal.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/StokTable.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/StokTable.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/StokTable.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/StokTable.module.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,6 +109,7 @@
       <workItem from="1761378133136" duration="169000" />
       <workItem from="1761378470243" duration="1305000" />
       <workItem from="1761379861322" duration="31000" />
+      <workItem from="1761381547432" duration="466000" />
     </task>
     <servers />
   </component>

@@ -53,7 +53,7 @@ export default function EditStokModal({ isOpen, onClose, onStokUpdated, stokItem
     finalDateTime.setHours(parseInt(jam, 10), parseInt(menit, 10), 0, 0);
 
     const stokData = {
-      menu_id: selectedMenuId,
+      // menu_id tidak dikirim karena tidak diubah
       kuantiti: parseInt(quantity, 10),
       modal: parseFloat(modal),
       harga_jual: parseFloat(hargaJual),
@@ -94,7 +94,7 @@ export default function EditStokModal({ isOpen, onClose, onStokUpdated, stokItem
           <form onSubmit={handleSubmit} className={styles.stokForm}>
             <div className={styles.formGroup}>
               <label htmlFor="menu-edit">Pilih Menu</label>
-              <select id="menu-edit" value={selectedMenuId} onChange={(e) => setSelectedMenuId(e.target.value)} required>
+              <select id="menu-edit" value={selectedMenuId} disabled required>
                 <option value="" disabled>-- Pilih Menu --</option>
                 {menuItems.map(item => (
                   <option key={item._id} value={item._id}>{item.name}</option>
