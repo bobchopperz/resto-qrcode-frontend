@@ -22,7 +22,9 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/user/login`, {
+      // const response = await fetch(`${API_BASE_URL}/user/login`, { //13:36 28/10/2025 bug is found by rheza, rupanya karena pointing ke localhost
+	  
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/user/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
