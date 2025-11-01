@@ -4,13 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
-import { ChevronLeft, LayoutDashboard, ClipboardList, BarChart2, Salad, LogOut, Users, MessageCircleReply, Menu as MenuIcon, CookingPot } from 'lucide-react'; // Impor CookingPot
+import { ChevronLeft, LayoutDashboard, ClipboardList, BarChart2, Salad, LogOut, Users, MessageCircleReply, Menu as MenuIcon, CookingPot, SquareCheck } from 'lucide-react'; // Ganti ke SquareCheck
 
 // Daftar menu untuk sidebar
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { href: '/dashboard/menu', label: 'Menu', icon: <ClipboardList size={20} /> },
-  { href: '/dashboard/stok', label: 'Stok', icon: <CookingPot size={20} /> }, // Tambahkan menu Stok
+  { href: '/dashboard/opsi-menu', label: 'Opsi Menu', icon: <SquareCheck size={20} /> }, // Ganti ikon di sini
+  { href: '/dashboard/stok', label: 'Stok', icon: <CookingPot size={20} /> },
   { href: '/dashboard/sales', label: 'Penjualan', icon: <BarChart2 size={20} /> },
   { href: '/dashboard/whatsapp', label: 'Whatsapp', icon: <MessageCircleReply size={20} /> },
   { href: '/dashboard/users', label: 'User', icon: <Users size={20} /> },

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './MenuTable.module.css';
-import { Plus, Edit, Trash2, Camera, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Camera, X, SquareCheck } from 'lucide-react';
 import AddMenuModal from './AddMenuModal';
 import EditMenuModal from './EditMenuModal';
 
@@ -14,6 +14,27 @@ const formatRupiah = (number) => {
   }).format(number || 0);
 };
 
+// Opsi Modal Component
+const OpsiListModal = ({ isOpen, onClose, opsiItems }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.modalBackdrop} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2>Daftar Opsi Terdaftar</h2>
+          <button className={styles.modalCloseButton} onClick={onClose}><X size={20} /></button>
+        </div>
+        <ul className={styles.opsiList}>
+          {opsiItems.map(opsi => (
+            <li key={opsi._id}>{opsi.nama_opsi}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
 export default function MenuTable() {
   const [menuItems, setMenuItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,6 +43,7 @@ export default function MenuTable() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [menuItemToEdit, setMenuItemToEdit] = useState(null);
+  const [opsiToShow, setOpsiToShow] = useState(null); // State for opsi modal
 
   const fetchMenu = async () => {
     setIsLoading(true);
@@ -70,11 +92,6 @@ export default function MenuTable() {
     }
   };
 
-  const getFilename = (path) => {
-    if (!path) return 'Tidak ada gambar';
-    return path.split('/').pop();
-  };
-
   if (error) {
     return <div className={styles.error}>Error: {error}</div>;
   }
@@ -101,6 +118,7 @@ export default function MenuTable() {
                 <th>Harga</th>
                 <th>Stok</th>
                 <th>Image</th>
+                <th>Opsi</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -114,14 +132,24 @@ export default function MenuTable() {
                     <td data-label="Harga">{formatRupiah(item.price)}</td>
                     <td data-label="Stok">{item.stok}</td>
                     <td data-label="Image">
-                      <div className={styles.imageCell}>
-                        <button
+                      <button
+                        className={`${styles.actionButton} ${styles.showButton}`}
+                        onClick={() => setImageToShow(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${item.imageUrl}`)}
+                      >
+                        <Camera size={16} />
+                      </button>
+                    </td>
+                    <td data-label="Opsi">
+                      {item.opsi && item.opsi.length > 0 ? (
+                        <button 
                           className={`${styles.actionButton} ${styles.showButton}`}
-                          onClick={() => setImageToShow(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}${item.imageUrl}`)}
+                          onClick={() => setOpsiToShow(item.opsi)}
                         >
-                          <Camera size={16} />
+                          <SquareCheck size={16} />
                         </button>
-                      </div>
+                      ) : (
+                        '-'
+                      )}
                     </td>
                     <td data-label="Aksi">
                       <div className={styles.actionButtons}>
@@ -133,7 +161,7 @@ export default function MenuTable() {
                         </button>
                         <button 
                           className={`${styles.actionButton} ${styles.deleteButton}`}
-                          onClick={() => handleDelete(item._id)} // Panggil fungsi handleDelete
+                          onClick={() => handleDelete(item._id)}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -143,7 +171,7 @@ export default function MenuTable() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center' }}>Belum ada menu.</td>
+                  <td colSpan="8" style={{ textAlign: 'center' }}>Belum ada menu.</td>
                 </tr>
               )}
             </tbody>
@@ -151,24 +179,25 @@ export default function MenuTable() {
         </div>
       )}
 
-      {/* Modal untuk menampilkan gambar */}
+      {/* Modals */}
       {imageToShow && (
-        <div className={styles.imageModalBackdrop} onClick={() => setImageToShow(null)}>
-          <div className={styles.imageModalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.imageModalCloseButton} onClick={() => setImageToShow(null)}><X size={20} /></button>
+        <div className={styles.modalBackdrop} onClick={() => setImageToShow(null)}>
+          <div className={`${styles.modalContent} ${styles.imageModalContent}`} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalCloseButton} onClick={() => setImageToShow(null)}><X size={20} /></button>
             <img src={imageToShow} alt="Pratinjau Menu" className={styles.imageModalPreview} />
           </div>
         </div>
       )}
-
-      {/* Modal Tambah Menu */}
+      <OpsiListModal 
+        isOpen={!!opsiToShow} 
+        onClose={() => setOpsiToShow(null)} 
+        opsiItems={opsiToShow || []} 
+      />
       <AddMenuModal 
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         onMenuAdded={fetchMenu}
       />
-
-      {/* Modal Edit Menu */}
       <EditMenuModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

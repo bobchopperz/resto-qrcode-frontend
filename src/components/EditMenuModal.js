@@ -3,31 +3,57 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './MenuTable.module.css';
 import { X, Camera } from 'lucide-react';
+import axios from 'axios';
 
 export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [modal, setModal] = useState('');
   const [price, setPrice] = useState('');
-  const [stok, setStok] = useState(''); // State baru untuk stok
+  const [stok, setStok] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
+  const [opsiMenuList, setOpsiMenuList] = useState([]);
+  const [selectedOpsi, setSelectedOpsi] = useState([]);
+
   useEffect(() => {
     if (isOpen && menuItem) {
+      const fetchOpsiMenu = async () => {
+        try {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/opsi-menu`);
+          setOpsiMenuList(response.data);
+        } catch (error) {
+          console.error("Error fetching opsi menu:", error);
+        }
+      };
+      fetchOpsiMenu();
+
       setName(menuItem.name || '');
       setDescription(menuItem.description || '');
-      setModal(menuItem.modal || '');
-      setPrice(menuItem.price || '');
-      setStok(menuItem.stok || ''); // Isi stok saat modal dibuka
+      // --- PERBAIKAN DI SINI ---
+      setModal(menuItem.modal !== undefined && menuItem.modal !== null ? menuItem.modal : '');
+      setPrice(menuItem.price !== undefined && menuItem.price !== null ? menuItem.price : '');
+      setStok(menuItem.stok !== undefined && menuItem.stok !== null ? menuItem.stok : '');
+      // ------------------------
+      setSelectedOpsi(menuItem.opsi ? menuItem.opsi.map(o => o._id) : []);
+      
       setImageFile(null);
       setError(null);
     }
   }, [isOpen, menuItem]);
 
   if (!isOpen) return null;
+
+  const handleOpsiChange = (opsiId) => {
+    setSelectedOpsi(prev => 
+      prev.includes(opsiId) 
+        ? prev.filter(id => id !== opsiId) 
+        : [...prev, opsiId]
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,10 +65,13 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
     formData.append('description', description);
     formData.append('modal', modal);
     formData.append('price', price);
-    formData.append('stok', stok); // Tambahkan stok ke form data
+    formData.append('stok', stok);
     if (imageFile) {
       formData.append('imageFile', imageFile);
     }
+    selectedOpsi.forEach(opsiId => {
+      formData.append('opsi[]', opsiId);
+    });
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu/${menuItem._id}`, {
@@ -95,6 +124,23 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
           <div className={styles.formGroup}>
             <label htmlFor="stok">Stok</label>
             <input type="number" id="stok" value={stok} onChange={(e) => setStok(e.target.value)} required min="0" />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Opsi Menu (Opsional)</label>
+            <div className={styles.checkboxContainer}>
+              {opsiMenuList.map(opsi => (
+                <div key={opsi._id} className={styles.checkboxItem}>
+                  <input 
+                    type="checkbox" 
+                    id={`edit-opsi-${opsi._id}`}
+                    value={opsi._id}
+                    checked={selectedOpsi.includes(opsi._id)}
+                    onChange={() => handleOpsiChange(opsi._id)}
+                  />
+                  <label htmlFor={`edit-opsi-${opsi._id}`}>{opsi.nama_opsi}</label>
+                </div>
+              ))}
+            </div>
           </div>
           <div className={styles.formGroup}>
             <label>Gambar Menu</label>
