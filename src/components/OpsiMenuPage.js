@@ -98,12 +98,12 @@ export default function OpsiMenuPage() {
       if (currentOpsi) {
         // Update
         await axios.put(`${API_URL}/opsi-menu/${currentOpsi._id}`, opsiData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
         });
       } else {
         // Create
         await axios.post(`${API_URL}/opsi-menu`, opsiData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
         });
       }
       fetchOpsiMenu(); // Refresh data
@@ -118,7 +118,7 @@ export default function OpsiMenuPage() {
     if (window.confirm('Apakah Anda yakin ingin menghapus opsi ini?')) {
       try {
         await axios.delete(`${API_URL}/opsi-menu/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
         });
         fetchOpsiMenu(); // Refresh data
       } catch (error) {

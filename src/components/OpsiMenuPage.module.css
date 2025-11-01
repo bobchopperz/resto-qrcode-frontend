@@ -56,7 +56,7 @@
     text-align: left;
     border-bottom: 1px solid #e9ecef;
     vertical-align: middle;
-    white-space: nowrap;
+    white-space: normal; /* Allow wrapping */
 }
 
 .table th {
@@ -107,7 +107,7 @@
     background-color: #c82333;
 }
 
-/* Modal Styles (Disamakan dengan Stok) */
+/* Modal Styles */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -198,7 +198,7 @@
     background-color: #5a6268;
 }
 
-/* Mobile Responsive */
+/* --- Mobile Responsive --- */
 @media (max-width: 768px) {
     .header h1 {
         font-size: 1.1rem;
@@ -221,28 +221,27 @@
         margin-bottom: 1rem;
         border: 1px solid #e9ecef;
         border-radius: 8px;
+        padding: 0.5rem;
     }
     .table td {
-        text-align: right;
-        padding-left: 50%;
-        position: relative;
-        white-space: normal;
-        border-bottom: none;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid #e9ecef;
+        text-align: left; /* Rata kiri untuk semua */
+        display: block; /* Pastikan display block */
     }
-    .table td:last-child {
+    .table tr td:last-child {
         border-bottom: 0;
     }
     .table td::before {
         content: attr(data-label);
-        position: absolute;
-        left: 1rem;
-        width: 45%;
-        padding-right: 1rem;
-        text-align: left;
         font-weight: bold;
         color: #333;
+        display: block; /* Label di atas nilai */
+        margin-bottom: 0.25rem; /* Jarak antara label dan nilai */
+        font-size: 0.8rem;
+        text-transform: uppercase;
     }
     .actionButtons {
-        justify-content: flex-end;
+        justify-content: flex-start; /* Tombol aksi rata kiri */
     }
 }
