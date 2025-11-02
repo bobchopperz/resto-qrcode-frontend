@@ -83,14 +83,14 @@ export default function OptionSelectionModal({ isOpen, onClose, menuItem, onAddT
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-2xl font-bold text-gray-800">{menuItem.name}</h3>
+          <h3 className="text-2xl font-semibold text-gray-800">{menuItem.name}</h3> {/* --- PERBAIKAN DI SINI --- */}
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X size={24} /></button>
         </div>
         
         <div className="p-6 max-h-[60vh] overflow-y-auto">
           {hasOptions && menuItem.opsi.map(opsiGroup => (
-            <fieldset key={opsiGroup._id} className="mb-6">
-              <legend className="font-semibold text-lg text-gray-700 mb-3">{opsiGroup.nama_opsi}</legend>
+            <fieldset key={opsiGroup._id} className="mb-6 border border-gray-300 p-4 rounded-md">
+              <legend className="font-medium text-lg text-gray-700 mb-3 px-2">{opsiGroup.nama_opsi}</legend> {/* --- PERBAIKAN DI SINI --- */}
               <div className="space-y-3">
                 {opsiGroup.list_opsi.map(pilihan => (
                   <div key={pilihan} className="flex items-center">
@@ -101,9 +101,9 @@ export default function OptionSelectionModal({ isOpen, onClose, menuItem, onAddT
                       value={pilihan}
                       checked={selectedOptions[opsiGroup.nama_opsi] === pilihan}
                       onChange={() => handleOptionChange(opsiGroup.nama_opsi, pilihan)}
-                      className="custom-radio" // Terapkan class kustom di sini
+                      className="custom-radio"
                     />
-                    <label htmlFor={`${opsiGroup._id}-${pilihan}`} className="ml-3 block text-md font-medium text-gray-700">
+                    <label htmlFor={`${opsiGroup._id}-${pilihan}`} className="ml-3 block text-md font-normal text-gray-700">
                       {pilihan}
                     </label>
                   </div>
