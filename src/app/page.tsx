@@ -4,12 +4,20 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import axios from "axios";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import OptionSelectionModal from "./components/OptionSelectionModal";
 import {
   ShoppingCart,
   Minus,
   Plus,
   X,
 } from "lucide-react";
+
+// --- INTERFACES ---
+interface Opsi {
+  _id: string;
+  nama_opsi: string;
+  list_opsi: string[];
+}
 
 interface MenuItem {
   _id: string;
@@ -18,20 +26,29 @@ interface MenuItem {
   price: number;
   imageUrl: string;
   stok: number;
+  opsi: Opsi[];
 }
 
-interface CartItem extends MenuItem {
+interface CartItem {
+  _id: string;
+  name: string;
+  price: number;
+  stok: number;
   quantity: number;
+  pilihan_opsi?: { [key: string]: string };
+  cartItemId: string; 
 }
+// ---------------------
 
 export default function Home() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerWa, setCustomerWa] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageToZoom, setImageToZoom] = useState<string | null>(null);
+  const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
 
   const fetchMenu = useCallback(async () => {
     try {
@@ -46,43 +63,51 @@ export default function Home() {
     fetchMenu();
   }, [fetchMenu]);
 
-  const handleAddToCart = (item: MenuItem) => {
-    if (item.stok <= 0) return;
-
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem._id === item._id);
-      if (existingItem) {
-        if (existingItem.quantity < item.stok) {
-          return prevCart.map((cartItem) =>
-            cartItem._id === item._id
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
-              : cartItem
-          );
-        }
-        return prevCart;
-      } else {
-        return [...prevCart, { ...item, quantity: 1 }];
-      }
-    });
+  // --- LOGIKA KERANJANG --- 
+  const handleOpenOptionsModal = (item: MenuItem) => {
+    setSelectedMenu(item);
   };
 
-  const handleUpdateQuantity = (itemId: string, amount: number) => {
+  const handleConfirmAddToCart = (item: CartItem) => {
+    setCart((prevCart) => [...prevCart, item]);
+    setSelectedMenu(null); 
+  };
+
+  const handleRemoveFromCart = (cartItemId: string) => {
+    setCart((prevCart) => prevCart.filter(item => item.cartItemId !== cartItemId));
+  };
+
+  const handleNonOpsiAddToCart = (item: MenuItem) => {
+    if (item.stok <= 0) return;
+    const newItem: CartItem = {
+      ...item,
+      quantity: 1,
+      cartItemId: `${item._id}-${Date.now()}`
+    };
+    setCart((prevCart) => [...prevCart, newItem]);
+  };
+
+  const handleUpdateNonOpsiQuantity = (cartItemId: string, amount: number) => {
     setCart((prevCart) =>
-      prevCart
-        .map((item) => {
-          if (item._id === itemId) {
-            const newQuantity = item.quantity + amount;
-            if (newQuantity > item.stok) {
-              alert(`Maaf, stok untuk ${item.name} hanya tersisa ${item.stok}.`);
-              return item;
-            }
-            return { ...item, quantity: newQuantity };
+      prevCart.map((item) => {
+        if (item.cartItemId === cartItemId) {
+          const newQuantity = item.quantity + amount;
+          if (newQuantity <= 0) {
+            // Akan dihapus oleh filter di bawah
+            return null; 
           }
-          return item;
-        })
-        .filter((item) => item.quantity > 0)
+          // Menggunakan stok asli dari item (bukan stok kalkulasi) karena ini item spesifik
+          if (newQuantity > item.stok) {
+            alert(`Maaf, stok untuk ${item.name} hanya tersisa ${item.stok}.`);
+            return item;
+          }
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      }).filter(Boolean) as CartItem[]
     );
   };
+  // -------------------------------------
 
   const { totalItems, totalPrice } = useMemo(() => {
     return cart.reduce(
@@ -106,9 +131,7 @@ export default function Home() {
     }
 
     setIsSubmitting(true);
-
     const formattedWa = customerWa.startsWith("0") ? `62${customerWa.substring(1)}` : customerWa;
-
     const orderData = {
       _id: crypto.randomUUID(),
       nama_pelanggan: customerName,
@@ -118,6 +141,7 @@ export default function Home() {
         name: item.name,
         kuantiti: item.quantity,
         sub_total: item.price * item.quantity,
+        pilihan_opsi: item.pilihan_opsi,
       })),
       total_kesuluruhan: totalPrice,
       timestamp: {"$date": new Date().toISOString()},
@@ -125,29 +149,33 @@ export default function Home() {
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order`, orderData);
-
       alert("Sipp Kakak! Pesananmu sudah kami terima dan sedang diproses.");
-
-      // Ambil data menu terbaru untuk update stok
       fetchMenu();
-
-      setIsModalOpen(false);
+      setIsCartModalOpen(false);
       setCart([]);
       setCustomerName("");
       setCustomerWa("");
-
     } catch (error) {
       console.error("Failed to submit order:", error);
       if (axios.isAxiosError(error) && error.response) {
-        console.error("Backend error:", error.response.data);
-        alert(`Gagal mengirim pesanan. Status: ${error.response.status}. Silakan coba lagi.`);
+        alert(`Gagal mengirim pesanan: ${error.response.data.message || 'Terjadi kesalahan'}`);
       } else {
-        alert('Terjadi kesalahan saat mengirim pesanan. Silakan coba lagi.');
+        alert('Terjadi kesalahan saat mengirim pesanan.');
       }
     } finally {
         setIsSubmitting(false);
     }
   };
+
+  // --- PERBAIKAN: Kalkulasi stok tersedia untuk modal ---
+  const availableStockForModal = useMemo(() => {
+    if (!selectedMenu) return 0;
+    const quantityInCart = cart
+      .filter(item => item._id === selectedMenu._id)
+      .reduce((sum, item) => sum + item.quantity, 0);
+    return selectedMenu.stok - quantityInCart;
+  }, [selectedMenu, cart]);
+  // ---------------------------------------------------
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-100">
@@ -167,9 +195,17 @@ export default function Home() {
           <div className="w-full max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
               {menu.map((item) => {
-                const cartItem = cart.find(ci => ci._id === item._id);
-                const isOutOfStock = item.stok <= 0;
-                const isCartMaxed = cartItem ? cartItem.quantity >= item.stok : false;
+                const hasOptions = item.opsi && item.opsi.length > 0;
+                
+                // --- PERBAIKAN: Kalkulasi stok tersedia per item ---
+                const quantityInCart = cart
+                  .filter(cartItem => cartItem._id === item._id)
+                  .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+                const availableStock = item.stok - quantityInCart;
+                const isOutOfStock = availableStock <= 0;
+                // ---------------------------------------------------
+
+                const cartItemForNonOpsi = cart.find(ci => ci._id === item._id && !ci.pilihan_opsi);
 
                 return (
                   <div key={item._id} className="group relative rounded-lg shadow-lg overflow-hidden h-96">
@@ -191,28 +227,31 @@ export default function Home() {
                         <p className="text-lg font-semibold text-emerald-600">
                           Rp {item.price.toLocaleString("id-ID")}
                         </p>
-                        {cartItem ? (
+                        
+                        {isOutOfStock ? (
+                          <span className="font-semibold text-red-500 bg-red-100 px-4 py-2 rounded-lg">Stok Habis</span>
+                        ) : hasOptions ? (
+                          <button onClick={() => handleOpenOptionsModal(item)} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                            Tambah
+                          </button>
+                        ) : cartItemForNonOpsi ? (
                           <div className="flex items-center gap-2">
-                            <button onClick={() => handleUpdateQuantity(item._id, -1)} className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
+                            <button onClick={() => handleUpdateNonOpsiQuantity(cartItemForNonOpsi.cartItemId, -1)} className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
                               <Minus size={16} />
                             </button>
-                            <span className="font-bold text-lg w-8 text-center text-sky-600">{cartItem.quantity}</span>
+                            <span className="font-bold text-lg w-8 text-center text-sky-600">{cartItemForNonOpsi.quantity}</span>
                             <button 
-                              onClick={() => handleUpdateQuantity(item._id, 1)} 
-                              disabled={isCartMaxed}
+                              onClick={() => handleUpdateNonOpsiQuantity(cartItemForNonOpsi.cartItemId, 1)} 
+                              disabled={cartItemForNonOpsi.quantity >= availableStock} // Gunakan availableStock
                               className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
                               <Plus size={16} />
                             </button>
                           </div>
                         ) : (
-                          isOutOfStock ? (
-                            <span className="font-semibold text-red-500 bg-red-100 px-4 py-2 rounded-lg">Stok Habis</span>
-                          ) : (
-                            <button onClick={() => handleAddToCart(item)} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
-                              Tambah
-                            </button>
-                          )
+                          <button onClick={() => handleNonOpsiAddToCart(item)} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                            Tambah
+                          </button>
                         )}
                       </div>
                     </div>
@@ -235,7 +274,7 @@ export default function Home() {
               <p className="text-2xl font-bold text-emerald-700">Rp {totalPrice.toLocaleString("id-ID")}</p>
             </div>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsCartModalOpen(true)}
               className="bg-emerald-600 text-white font-bold px-6 py-3 rounded-lg w-full md:w-auto hover:bg-emerald-700 transition-colors whitespace-nowrap"
             >
               Rincian Pesanan
@@ -244,12 +283,12 @@ export default function Home() {
         </div>
       )}
 
-      {isModalOpen && (
+      {isCartModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6 border-b flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-800">Konfirmasi Pesanan</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-800">
+              <button onClick={() => setIsCartModalOpen(false)} className="text-gray-500 hover:text-gray-800">
                 <X size={24} />
               </button>
             </div>
@@ -257,16 +296,21 @@ export default function Home() {
             <div className="p-6 max-h-[60vh] overflow-y-auto">
               <div className="space-y-4">
                 {cart.map((item) => (
-                  <div key={item._id} className="flex justify-between items-start">
+                  <div key={item.cartItemId} className="flex justify-between items-start">
                     <div>
-                      <p className="font-semibold text-gray-800">{item.name}</p>
-                      <p className="text-sm text-gray-500">
-                        {item.quantity} x {item.price.toLocaleString("id-ID")}
-                      </p>
+                      <p className="font-semibold text-gray-800">{item.name} (x{item.quantity})</p>
+                      {item.pilihan_opsi && (
+                        <p className="text-sm text-gray-500">
+                          {Object.values(item.pilihan_opsi).join(', ')}
+                        </p>
+                      )}
                     </div>
                     <p className="font-semibold text-gray-800">
                       Rp {(item.quantity * item.price).toLocaleString("id-ID")}
                     </p>
+                    <button onClick={() => handleRemoveFromCart(item.cartItemId)} className="text-red-500 hover:text-red-700 ml-4">
+                      <X size={18} />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -312,7 +356,14 @@ export default function Home() {
         </div>
       )}
 
-      {/* Modal Zoom Gambar */}
+      <OptionSelectionModal 
+        isOpen={!!selectedMenu}
+        onClose={() => setSelectedMenu(null)}
+        menuItem={selectedMenu}
+        onAddToCart={handleConfirmAddToCart}
+        availableStock={availableStockForModal} // Kirim stok tersedia ke modal
+      />
+
       {imageToZoom && (
         <div 
             onClick={() => setImageToZoom(null)} 
@@ -329,7 +380,7 @@ export default function Home() {
                     src={imageToZoom} 
                     alt="Zoomed"
                     className="max-w-[90vw] max-h-[90vh] object-contain"
-                    onClick={(e) => e.stopPropagation()} // Mencegah modal tertutup saat gambar diklik
+                    onClick={(e) => e.stopPropagation()} 
                 />
             </div>
         </div>

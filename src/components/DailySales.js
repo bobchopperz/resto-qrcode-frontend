@@ -65,7 +65,14 @@ function DailyDetailModal({ dayData, onClose }) {
                       <tbody>
                         {transaction.orders.map((order, index) => (
                           <tr key={index}>
-                            <td className={styles.td}>{order.name}</td>
+                            <td className={styles.td}>
+                              {order.name}
+                              {order.pilihan_opsi && Object.keys(order.pilihan_opsi).length > 0 && (
+                                <div className={styles.opsiDetail}>
+                                  {Object.values(order.pilihan_opsi).join(', ')}
+                                </div>
+                              )}
+                            </td>
                             <td className={styles.td}>{order.kuantiti}</td>
                             <td className={styles.td}>{formatRupiah(order.sub_total)}</td>
                           </tr>

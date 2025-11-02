@@ -17,4 +17,43 @@ body {
   .animate-marquee-y {
     animation: marquee-y 20s linear infinite;
   }
+
+  /* Custom Radio Button Styles */
+  .custom-radio {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 1.25rem; /* 20px */
+    height: 1.25rem; /* 20px */
+    border: 2px solid #ccc; /* Border abu-abu */
+    border-radius: 50%; /* Membuatnya bulat */
+    background-color: #ffffff; /* Background putih */
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+
+  .custom-radio:checked {
+    border-color: #059669; /* Emerald 600 */
+    background-color: #059669; /* Emerald 600 */
+  }
+
+  .custom-radio:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0.625rem; /* 10px */
+    height: 0.625rem; /* 10px */
+    border-radius: 50%;
+    background-color: white; /* Titik putih di tengah */
+  }
+
+  .custom-radio:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5); /* Ring focus */
+  }
 }

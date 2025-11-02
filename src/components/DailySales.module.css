@@ -80,7 +80,7 @@
   border-bottom: 1px solid #e9ecef;
   color: #434040;
   transition: background-color 0.2s ease;
-  white-space: nowrap; /* Prevent text wrapping */
+  white-space: nowrap; /* Prevent text from wrapping */
 }
 
 .listItem:hover {
@@ -219,6 +219,12 @@
   padding: 1rem;
   vertical-align: middle;
   white-space: nowrap;
+}
+
+.opsiDetail {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 0.25rem;
 }
 
 .transactionItem {
