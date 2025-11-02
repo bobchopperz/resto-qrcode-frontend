@@ -33,11 +33,9 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
 
       setName(menuItem.name || '');
       setDescription(menuItem.description || '');
-      // --- PERBAIKAN DI SINI ---
       setModal(menuItem.modal !== undefined && menuItem.modal !== null ? menuItem.modal : '');
       setPrice(menuItem.price !== undefined && menuItem.price !== null ? menuItem.price : '');
       setStok(menuItem.stok !== undefined && menuItem.stok !== null ? menuItem.stok : '');
-      // ------------------------
       setSelectedOpsi(menuItem.opsi ? menuItem.opsi.map(o => o._id) : []);
       
       setImageFile(null);
@@ -69,9 +67,16 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
     if (imageFile) {
       formData.append('imageFile', imageFile);
     }
-    selectedOpsi.forEach(opsiId => {
-      formData.append('opsi[]', opsiId);
-    });
+
+    // --- PERBAIKAN DI SINI ---
+    if (selectedOpsi.length > 0) {
+      selectedOpsi.forEach(opsiId => {
+        formData.append('opsi[]', opsiId);
+      });
+    } else {
+      formData.append('opsi', ''); // Kirim string kosong sebagai sinyal
+    }
+    // ------------------------
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu/${menuItem._id}`, {
