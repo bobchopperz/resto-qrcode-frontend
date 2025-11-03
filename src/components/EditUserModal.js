@@ -7,7 +7,8 @@ import { X } from 'lucide-react';
 export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState('user');
+  const [handphone, setHandphone] = useState('');
+  const [role, setRole] = useState('staff');
   const [password, setPassword] = useState(''); // Password opsional untuk update
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -16,7 +17,8 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
     if (isOpen && user) {
       setUsername(user.username || '');
       setName(user.name || '');
-      setRole(user.role || 'user');
+      setHandphone(user.handphone || '');
+      setRole(user.role || 'staff');
       setPassword(''); // Reset password field saat modal dibuka
       setError(null);
     }
@@ -32,6 +34,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
     const userData = {
       username,
       name,
+      handphone,
       role,
     };
 
@@ -98,14 +101,25 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
             />
           </div>
           <div className={styles.formGroup}>
+            <label htmlFor="handphone">No. Handphone</label>
+            <input
+              type="text"
+              id="handphone"
+              value={handphone}
+              onChange={(e) => setHandphone(e.target.value)}
+            />
+          </div>
+          <div className={styles.formGroup}>
             <label htmlFor="role">Role</label>
             <select
               id="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+                <option value="kitchen">Kitchen</option>
+                <option value="waiter">Waiter</option>
+                <option value="admin">Admin</option>
             </select>
           </div>
           <div className={styles.formGroup}>

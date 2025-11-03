@@ -8,7 +8,8 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState('user'); // Default role
+  const [handphone, setHandphone] = useState('');
+  const [role, setRole] = useState('staff'); // Default role
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -23,6 +24,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
       username,
       password,
       name,
+      handphone,
       role,
     };
 
@@ -47,7 +49,8 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
       setUsername('');
       setPassword('');
       setName('');
-      setRole('user');
+      setHandphone('');
+      setRole('staff');
     } catch (err) {
       setError(err.message);
       alert(`Gagal menambahkan user: ${err.message}`);
@@ -97,13 +100,24 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
             />
           </div>
           <div className={styles.formGroup}>
+            <label htmlFor="handphone">No. Handphone</label>
+            <input
+              type="text"
+              id="handphone"
+              value={handphone}
+              onChange={(e) => setHandphone(e.target.value)}
+            />
+          </div>
+          <div className={styles.formGroup}>
             <label htmlFor="role">Role</label>
             <select
               id="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="user">User</option>
+              <option value="staff">Staff</option>
+              <option value="kitchen">Kitchen</option>
+              <option value="waiter">Waiter</option>
               <option value="admin">Admin</option>
             </select>
           </div>

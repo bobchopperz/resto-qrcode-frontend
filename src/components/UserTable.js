@@ -97,6 +97,7 @@ export default function UserTable() {
                 <th>Username</th>
                 <th>Nama</th>
                 <th>Role</th>
+                <th>Handphone</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -107,6 +108,7 @@ export default function UserTable() {
                     <td data-label="Username">{user.username}</td>
                     <td data-label="Nama">{user.name}</td>
                     <td data-label="Role">{user.role}</td>
+                    <td data-label="Handphone">{user.handphone}</td>
                     <td data-label="Aksi">
                       <div className={styles.actionButtons}>
                         <button 
