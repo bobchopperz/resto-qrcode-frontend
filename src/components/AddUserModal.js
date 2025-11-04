@@ -100,7 +100,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="handphone">No. Handphone</label>
+            <label htmlFor="handphone">No. Handphone dimulai pake 62 ya</label>
             <input
               type="text"
               id="handphone"
