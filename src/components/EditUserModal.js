@@ -101,7 +101,6 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="handphone">No. Handphone dimulai pake 62 ya</label>
             <input
               type="text"
               id="handphone"
