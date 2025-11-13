@@ -8,25 +8,53 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 // Komponen Modal untuk Tambah/Edit
 const OpsiMenuModal = ({ isOpen, onClose, onSave, currentOpsi }) => {
   const [namaOpsi, setNamaOpsi] = useState('');
-  const [listOpsi, setListOpsi] = useState('');
+  const [listOpsi, setListOpsi] = useState([{ pilihan: '', modal: '0', harga_jual: '0' }]);
 
   useEffect(() => {
-    if (currentOpsi) {
-      setNamaOpsi(currentOpsi.nama_opsi);
-      setListOpsi(currentOpsi.list_opsi.join(', '));
-    } else {
-      setNamaOpsi('');
-      setListOpsi('');
+    if (isOpen) {
+      if (currentOpsi) {
+        setNamaOpsi(currentOpsi.nama_opsi);
+        // Pastikan list_opsi tidak kosong, jika kosong beri satu baris default
+        setListOpsi(currentOpsi.list_opsi.length > 0 ? currentOpsi.list_opsi : [{ pilihan: '', modal: '0', harga_jual: '0' }]);
+      } else {
+        // Reset form untuk 'Tambah Baru'
+        setNamaOpsi('');
+        setListOpsi([{ pilihan: '', modal: '0', harga_jual: '0' }]);
+      }
     }
   }, [currentOpsi, isOpen]);
 
   if (!isOpen) return null;
 
+  const handleListOpsiChange = (index, field, value) => {
+    const newList = [...listOpsi];
+    newList[index][field] = value;
+    setListOpsi(newList);
+  };
+
+  const handleAddRow = () => {
+    setListOpsi([...listOpsi, { pilihan: '', modal: '0', harga_jual: '0' }]);
+  };
+
+  const handleRemoveRow = (index) => {
+    // Hanya hapus jika baris lebih dari satu
+    if (listOpsi.length > 1) {
+      const newList = listOpsi.filter((_, i) => i !== index);
+      setListOpsi(newList);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Filter baris yang pilihan-nya tidak kosong
+    const filteredListOpsi = listOpsi.filter(item => item.pilihan.trim() !== '');
+    if (filteredListOpsi.length === 0) {
+      alert("Mohon isi setidaknya satu pilihan.");
+      return;
+    }
     const opsiData = {
       nama_opsi: namaOpsi,
-      list_opsi: listOpsi.split(',').map(item => item.trim()),
+      list_opsi: filteredListOpsi,
     };
     onSave(opsiData);
   };
@@ -46,16 +74,60 @@ const OpsiMenuModal = ({ isOpen, onClose, onSave, currentOpsi }) => {
               required 
             />
           </div>
+          
           <div className={styles.formGroup}>
-            <label>Daftar Pilihan (pisahkan dengan koma)</label>
-            <input 
-              type="text" 
-              value={listOpsi}
-              onChange={(e) => setListOpsi(e.target.value)}
-              placeholder="Contoh: Kuah Pedas, Kuah Original"
-              required 
-            />
+            <label>Daftar Pilihan</label>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Pilihan</th>
+                  <th>Modal</th>
+                  <th>Harga Jual</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listOpsi.map((item, index) => (
+                  <tr key={index}>
+                    <td>
+                      <input
+                        type="text"
+                        value={item.pilihan}
+                        onChange={(e) => handleListOpsiChange(index, 'pilihan', e.target.value)}
+                        placeholder="Cth: Kuah Pedas"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={item.modal}
+                        onChange={(e) => handleListOpsiChange(index, 'modal', e.target.value)}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={item.harga_jual}
+                        onChange={(e) => handleListOpsiChange(index, 'harga_jual', e.target.value)}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <button type="button" onClick={() => handleRemoveRow(index)} className={styles.deleteButton} disabled={listOpsi.length <= 1}>
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button type="button" onClick={handleAddRow} className={styles.addRowButton}>
+              <Plus size={16} /> Tambah Baris
+            </button>
           </div>
+
           <div className={styles.modalActions}>
             <button type="button" onClick={onClose} className={styles.btnSecondary}>Batal</button>
             <button type="submit" className={styles.btnPrimary}>Simpan</button>
@@ -138,6 +210,12 @@ export default function OpsiMenuPage() {
     setModalOpen(false);
   };
 
+  // Fungsi untuk format tampilan list opsi di tabel utama
+  const formatListOpsi = (list) => {
+    if (!list || list.length === 0) return '-';
+    return list.map(item => item.pilihan).join(', ');
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -164,7 +242,7 @@ export default function OpsiMenuPage() {
               {opsiMenuList.map((opsi) => (
                 <tr key={opsi._id}>
                   <td>{opsi.nama_opsi}</td>
-                  <td>{opsi.list_opsi.join(', ')}</td>
+                  <td>{formatListOpsi(opsi.list_opsi)}</td>
                   <td>
                     <div className={styles.actionButtons}>
                       <button onClick={() => openModal(opsi)} className={styles.editButton}><Edit size={18} /></button>

@@ -12,11 +12,17 @@ import {
   X,
 } from "lucide-react";
 
-// --- INTERFACES ---
+// --- INTERFACES YANG DIPERBARUI ---
+interface Pilihan {
+  pilihan: string;
+  harga_jual: string;
+  modal: string;
+}
+
 interface Opsi {
   _id: string;
   nama_opsi: string;
-  list_opsi: string[];
+  list_opsi: Pilihan[]; // Menggunakan interface Pilihan
 }
 
 interface MenuItem {
@@ -29,14 +35,11 @@ interface MenuItem {
   opsi: Opsi[];
 }
 
-interface CartItem {
-  _id: string;
-  name: string;
-  price: number;
-  stok: number;
+// CartItem sekarang extends MenuItem untuk membawa semua data menu, ditambah quantity dan pilihan_opsi
+interface CartItem extends MenuItem {
   quantity: number;
-  pilihan_opsi?: { [key: string]: string };
-  cartItemId: string; 
+  pilihan_opsi?: { [key: string]: string }; // Hanya menyimpan nama opsi yang dipilih
+  cartItemId: string; // ID unik untuk item di keranjang
 }
 // ---------------------
 
@@ -52,6 +55,7 @@ export default function Home() {
 
   const fetchMenu = useCallback(async () => {
     try {
+      // Pastikan backend endpoint /menu sudah mengembalikan opsi dengan struktur Pilihan[]
       const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
       setMenu(response.data);
     } catch (error) {
@@ -62,6 +66,27 @@ export default function Home() {
   useEffect(() => {
     fetchMenu();
   }, [fetchMenu]);
+
+  // Helper function untuk menghitung total harga satu item di keranjang (termasuk opsi)
+  const calculateItemTotalPrice = useCallback((cartItem: CartItem) => {
+    let itemPrice = cartItem.price; // Mulai dengan harga dasar menu
+
+    if (cartItem.pilihan_opsi) {
+      for (const namaOpsi in cartItem.pilihan_opsi) {
+        const pilihanNama = cartItem.pilihan_opsi[namaOpsi];
+        // Cari grup opsi di dalam data menu item itu sendiri
+        const opsiGroup = cartItem.opsi.find(og => og.nama_opsi === namaOpsi);
+        if (opsiGroup) {
+          // Cari pilihan spesifik di dalam grup opsi
+          const pilihanData = opsiGroup.list_opsi.find(p => p.pilihan === pilihanNama);
+          if (pilihanData) {
+            itemPrice += Number(pilihanData.harga_jual);
+          }
+        }
+      }
+    }
+    return itemPrice * cartItem.quantity;
+  }, []);
 
   // --- LOGIKA KERANJANG --- 
   const handleOpenOptionsModal = (item: MenuItem) => {
@@ -80,7 +105,7 @@ export default function Home() {
   const handleNonOpsiAddToCart = (item: MenuItem) => {
     if (item.stok <= 0) return;
     const newItem: CartItem = {
-      ...item,
+      ...item, // Menggunakan spread operator untuk menyertakan semua properti MenuItem
       quantity: 1,
       cartItemId: `${item._id}-${Date.now()}`
     };
@@ -93,10 +118,8 @@ export default function Home() {
         if (item.cartItemId === cartItemId) {
           const newQuantity = item.quantity + amount;
           if (newQuantity <= 0) {
-            // Akan dihapus oleh filter di bawah
             return null; 
           }
-          // Menggunakan stok asli dari item (bukan stok kalkulasi) karena ini item spesifik
           if (newQuantity > item.stok) {
             alert(`Maaf, stok untuk ${item.name} hanya tersisa ${item.stok}.`);
             return item;
@@ -109,17 +132,20 @@ export default function Home() {
   };
   // -------------------------------------
 
+  // --- KALKULASI TOTAL ITEM DAN TOTAL HARGA DENGAN OPSI ---
   const { totalItems, totalPrice } = useMemo(() => {
-    return cart.reduce(
-      (acc, item) => {
-        acc.totalItems += item.quantity;
-        acc.totalPrice += item.price * item.quantity;
-        return acc;
-      },
-      { totalItems: 0, totalPrice: 0 }
-    );
-  }, [cart]);
+    let calculatedTotalItems = 0;
+    let calculatedTotalPrice = 0;
 
+    cart.forEach(cartItem => {
+      calculatedTotalItems += cartItem.quantity;
+      calculatedTotalPrice += calculateItemTotalPrice(cartItem);
+    });
+
+    return { totalItems: calculatedTotalItems, totalPrice: calculatedTotalPrice };
+  }, [cart, calculateItemTotalPrice]); // Tambahkan calculateItemTotalPrice sebagai dependency
+
+  // --- SUBMIT ORDER KE BACKEND ---
   const handleSubmitOrder = async () => {
     if (cart.length === 0) {
       alert("Keranjang Kakak masih kosong.");
@@ -132,24 +158,32 @@ export default function Home() {
 
     setIsSubmitting(true);
     const formattedWa = customerWa.startsWith("0") ? `62${customerWa.substring(1)}` : customerWa;
+    
+    // Memetakan item keranjang ke struktur yang diharapkan backend (CreateOrderItemDto)
+    const orderItemsPayload = cart.map(item => {
+      const opsiTerpilihPayload = item.pilihan_opsi ? Object.keys(item.pilihan_opsi).map(namaOpsi => ({
+        nama_opsi: namaOpsi,
+        pilihan: item.pilihan_opsi![namaOpsi] // Ambil nama pilihan saja
+      })) : [];
+
+      return {
+        menuId: item._id,
+        jumlah: item.quantity,
+        opsi_terpilih: opsiTerpilihPayload,
+      };
+    });
+
     const orderData = {
-      _id: crypto.randomUUID(),
       nama_pelanggan: customerName,
       no_wa_pelanggan: formattedWa,
-      orders: cart.map(item => ({
-        menu_id: item._id,
-        name: item.name,
-        kuantiti: item.quantity,
-        sub_total: item.price * item.quantity,
-        pilihan_opsi: item.pilihan_opsi,
-      })),
-      total_kesuluruhan: totalPrice,
-      timestamp: {"$date": new Date().toISOString()},
+      items: orderItemsPayload, // Menggunakan 'items' sesuai DTO backend
     };
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order`, orderData);
-      alert("Sipp Kakak! Pesananmu sudah kami terima dan sedang diproses.");
+      // const orderDataInJson = JSON.stringify(orderData, null, 2);
+      alert("Sipp Kakak! Pesananmu sudah kami terima dan sedang diproses. ");
+      // console.log('isi jsonnya : '+orderDataInJson);
       fetchMenu();
       setIsCartModalOpen(false);
       setCart([]);
@@ -167,7 +201,7 @@ export default function Home() {
     }
   };
 
-  // --- PERBAIKAN: Kalkulasi stok tersedia untuk modal ---
+  // --- Kalkulasi stok tersedia untuk modal OptionSelectionModal ---
   const availableStockForModal = useMemo(() => {
     if (!selectedMenu) return 0;
     const quantityInCart = cart
@@ -197,7 +231,7 @@ export default function Home() {
               {menu.map((item) => {
                 const hasOptions = item.opsi && item.opsi.length > 0;
                 
-                // --- PERBAIKAN: Kalkulasi stok tersedia per item ---
+                // --- Kalkulasi stok tersedia per item ---
                 const quantityInCart = cart
                   .filter(cartItem => cartItem._id === item._id)
                   .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
@@ -205,6 +239,7 @@ export default function Home() {
                 const isOutOfStock = availableStock <= 0;
                 // ---------------------------------------------------
 
+                // Mencari item non-opsi di keranjang untuk update kuantitas
                 const cartItemForNonOpsi = cart.find(ci => ci._id === item._id && !ci.pilihan_opsi);
 
                 return (
@@ -299,14 +334,28 @@ export default function Home() {
                   <div key={item.cartItemId} className="flex justify-between items-start">
                     <div>
                       <p className="font-semibold text-gray-800">{item.name} (x{item.quantity})</p>
-                      {item.pilihan_opsi && (
+                      {/* Menampilkan opsi yang dipilih di modal keranjang */}
+                      {item.pilihan_opsi && Object.keys(item.pilihan_opsi).length > 0 && (
                         <p className="text-sm text-gray-500">
-                          {Object.values(item.pilihan_opsi).join(', ')}
+                          {Object.keys(item.pilihan_opsi).map(namaOpsi => {
+                            const pilihanNama = item.pilihan_opsi![namaOpsi];
+                            // Cari harga jual opsi untuk ditampilkan
+                            const opsiGroup = item.opsi.find(og => og.nama_opsi === namaOpsi);
+                            let optionPriceDisplay = '';
+                            if (opsiGroup) {
+                              const pilihanData = opsiGroup.list_opsi.find(p => p.pilihan === pilihanNama);
+                              if (pilihanData && Number(pilihanData.harga_jual) > 0) {
+                                optionPriceDisplay = ` (+${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(pilihanData.harga_jual))})`;
+                              }
+                            }
+                            return `${pilihanNama}${optionPriceDisplay}`;
+                          }).join(', ')}
                         </p>
                       )}
                     </div>
                     <p className="font-semibold text-gray-800">
-                      Rp {(item.quantity * item.price).toLocaleString("id-ID")}
+                      {/* Menampilkan harga total per item di modal keranjang */}
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(calculateItemTotalPrice(item))}
                     </p>
                     <button onClick={() => handleRemoveFromCart(item.cartItemId)} className="text-red-500 hover:text-red-700 ml-4">
                       <X size={18} />
@@ -361,7 +410,7 @@ export default function Home() {
         onClose={() => setSelectedMenu(null)}
         menuItem={selectedMenu}
         onAddToCart={handleConfirmAddToCart}
-        availableStock={availableStockForModal} // Kirim stok tersedia ke modal
+        availableStock={availableStockForModal}
       />
 
       {imageToZoom && (

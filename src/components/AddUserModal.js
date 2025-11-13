@@ -105,6 +105,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
               type="text"
               id="handphone"
               value={handphone}
+              placeholder="Contoh: 628123456789"
               onChange={(e) => setHandphone(e.target.value)}
             />
           </div>

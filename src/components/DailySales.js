@@ -41,7 +41,7 @@ function DailyDetailModal({ dayData, onClose }) {
               <p className={styles.transactionHeader}>Pelanggan : {transaction.nama_pelanggan || 'N/A'}</p>
               <div className={styles.transactionDetails}>
                 <span><strong>No. WA :</strong> {transaction.no_wa_pelanggan || '-'}</span>
-                <span><strong>Total :</strong> {formatRupiah(transaction.total_kesuluruhan)}</span>
+                <span><strong>Total :</strong> {formatRupiah(transaction.total_jual_keseluruhan)}</span>
                 <span><strong>Modal :</strong> {formatRupiah(transaction.total_modal_keseluruhan)}</span>
                 <span><strong>Margin :</strong> {formatRupiah(transaction.total_margin_keseluruhan)}</span>
               </div>
@@ -63,18 +63,18 @@ function DailyDetailModal({ dayData, onClose }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {transaction.orders.map((order, index) => (
+                        {transaction.items.map((item, index) => (
                           <tr key={index}>
                             <td className={styles.td}>
-                              {order.name}
-                              {order.pilihan_opsi && Object.keys(order.pilihan_opsi).length > 0 && (
+                              {item.nama_menu}
+                              {item.opsi_terpilih && item.opsi_terpilih.length > 0 && (
                                 <div className={styles.opsiDetail}>
-                                  {Object.values(order.pilihan_opsi).join(', ')}
+                                  {item.opsi_terpilih.map(opsi => opsi.pilihan).join(', ')}
                                 </div>
                               )}
                             </td>
-                            <td className={styles.td}>{order.kuantiti}</td>
-                            <td className={styles.td}>{formatRupiah(order.sub_total)}</td>
+                            <td className={styles.td}>{item.jumlah}</td>
+                            <td className={styles.td}>{formatRupiah(item.subtotal_jual)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -136,14 +136,14 @@ function DailySalesContent() {
       return;
     }
     const dailyGroups = transactions.reduce((acc, transaction) => {
-      if (!transaction.timestamp) {
-        console.warn('Transaksi dilewati karena tidak ada timestamp:', transaction);
+      if (!transaction.createdAt) {
+        console.warn('Transaksi dilewati karena tidak ada createdAt:', transaction);
         return acc;
       }
 
-      const dateObj = new Date(transaction.timestamp);
+      const dateObj = new Date(transaction.createdAt);
       if (isNaN(dateObj.getTime())) {
-        console.warn('Transaksi dilewati karena timestamp tidak valid:', transaction.timestamp, transaction);
+        console.warn('Transaksi dilewati karena createdAt tidak valid:', transaction.createdAt, transaction);
         return acc;
       }
 
@@ -151,7 +151,7 @@ function DailySalesContent() {
       if (!acc[dateKey]) {
         acc[dateKey] = { date: dateObj, formattedDate: new DateID(dateObj).format('d-MMM-yyyy'), totalSales: 0, totalMargin: 0, totalModal: 0, transactions: [] };
       }
-      acc[dateKey].totalSales += transaction.total_kesuluruhan;
+      acc[dateKey].totalSales += transaction.total_jual_keseluruhan;
       acc[dateKey].totalMargin += transaction.total_margin_keseluruhan;
       acc[dateKey].totalModal += transaction.total_modal_keseluruhan;
       acc[dateKey].transactions.push(transaction);
