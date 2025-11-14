@@ -5,7 +5,7 @@ import { Minus, Plus, X } from 'lucide-react';
 interface Pilihan {
   pilihan: string;
   harga_jual: string;
-  modal: string;
+  // modal: string;
 }
 
 interface Opsi {

@@ -56,7 +56,7 @@ export default function Home() {
   const fetchMenu = useCallback(async () => {
     try {
       // Pastikan backend endpoint /menu sudah mengembalikan opsi dengan struktur Pilihan[]
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu/order`);
       setMenu(response.data);
     } catch (error) {
       console.error("Failed to fetch menu:", error);
