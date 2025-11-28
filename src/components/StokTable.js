@@ -31,12 +31,21 @@ export default function StokTable() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const stokResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/stok`);
+      const token = localStorage.getItem('accessToken');
+      const stokResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/stok`,{
+          headers: {
+              'Authorization': `Bearer ${token}`,
+          },
+      });
       if (!stokResponse.ok) throw new Error('Gagal mengambil histori stok.');
       const stokData = await stokResponse.json();
       setStokHistory(stokData);
 
-      const menuResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
+      const menuResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`,{
+          headers: {
+              'Authorization': `Bearer ${token}`,
+          },
+      });
       if (!menuResponse.ok) throw new Error('Gagal mengambil data menu.');
       const menuData = await menuResponse.json();
       setMenuItems(menuData);
@@ -61,8 +70,12 @@ export default function StokTable() {
   const handleDelete = async (stokId) => {
     if (window.confirm('Apakah Kakak yakin ingin menghapus catatan stok ini? Ini akan mempengaruhi total stok menu terkait.')) {
       try {
+          const token = localStorage.getItem('accessToken');
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/stok/${stokId}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
         });
 
         if (!response.ok) {

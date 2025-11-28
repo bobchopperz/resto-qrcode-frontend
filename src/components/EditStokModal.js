@@ -61,9 +61,13 @@ export default function EditStokModal({ isOpen, onClose, onStokUpdated, stokItem
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/stok/${stokItem._id}`, {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/stok/${stokItem._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(stokData),
       });
 

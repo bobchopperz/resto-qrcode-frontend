@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './DashboardPage.module.css'; // Import CSS Module
 
 export default function DashboardPage() {
   const [userName, setUserName] = useState('Kakak'); // Default value
+  const router = useRouter();
 
   useEffect(() => {
+
     // Fungsi untuk mendekode JWT dan mendapatkan nama pengguna
     const decodeJwt = (token) => {
       try {
@@ -31,8 +34,10 @@ export default function DashboardPage() {
       } else if (decodedToken && decodedToken.username) { // Fallback ke username jika 'name' tidak ada
         setUserName(decodedToken.username);
       }
+    } else {
+        router.push('/login');
     }
-  }, []);
+  }, [router]);
 
   return (
     <div className={styles.container}>

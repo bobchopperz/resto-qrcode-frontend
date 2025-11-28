@@ -23,7 +23,12 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
     if (isOpen && menuItem) {
       const fetchOpsiMenu = async () => {
         try {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/opsi-menu`);
+          const token = localStorage.getItem('accessToken');
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/opsi-menu`, {
+              headers:{
+                  'Authorization': `Bearer ${token}`,
+              },
+          });
           setOpsiMenuList(response.data);
         } catch (error) {
           console.error("Error fetching opsi menu:", error);
@@ -79,9 +84,13 @@ export default function EditMenuModal({ isOpen, onClose, onMenuUpdated, menuItem
     // ------------------------
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu/${menuItem._id}`, {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu/${menuItem._id}`, {
         method: 'PUT',
         body: formData,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
       });
 
       if (!response.ok) {

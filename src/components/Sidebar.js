@@ -22,6 +22,8 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
+    // Hapus token dari localStorage untuk "logout"
+    localStorage.removeItem('accessToken');
     router.push('/login');
   };
 

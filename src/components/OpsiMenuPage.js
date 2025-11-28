@@ -151,7 +151,12 @@ export default function OpsiMenuPage() {
   const fetchOpsiMenu = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/opsi-menu`);
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(`${API_URL}/opsi-menu`,{
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+      });
       setOpsiMenuList(response.data);
     } catch (error) {
       console.error("Error fetching opsi menu:", error);

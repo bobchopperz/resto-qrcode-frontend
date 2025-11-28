@@ -48,7 +48,12 @@ export default function MenuTable() {
   const fetchMenu = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`);
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`, {
+          headers: {
+              'Authorization' : `Bearer ${token}`, // ingat pake ` bukan ' !
+          },
+      });
       if (!response.ok) {
         throw new Error(`Gagal mengambil data menu. Status: ${response.status}`);
       }
@@ -74,8 +79,12 @@ export default function MenuTable() {
   const handleDelete = async (menuId) => {
     if (window.confirm('Apakah Kakak yakin ingin menghapus menu ini?')) {
       try {
+        const token = localStorage.getItem('accessToken');
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu/${menuId}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
         });
 
         if (!response.ok) {

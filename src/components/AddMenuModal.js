@@ -19,12 +19,18 @@ export default function AddMenuModal({ isOpen, onClose, onMenuAdded }) {
   const [opsiMenuList, setOpsiMenuList] = useState([]);
   const [selectedOpsi, setSelectedOpsi] = useState([]);
 
+  const token = localStorage.getItem('accessToken');
+
   useEffect(() => {
     if (isOpen) {
       // Fetch opsi menu when modal opens
       const fetchOpsiMenu = async () => {
         try {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/opsi-menu`);
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/opsi-menu`,{
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
           setOpsiMenuList(response.data);
         } catch (error) {
           console.error("Error fetching opsi menu:", error);
@@ -77,6 +83,9 @@ export default function AddMenuModal({ isOpen, onClose, onMenuAdded }) {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/menu`, {
         method: 'POST',
         body: formData,
+        headers: {
+              'Authorization': `Bearer ${token}`,
+          },
       });
 
       if (!response.ok) {

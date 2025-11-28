@@ -110,7 +110,12 @@ function DailySalesContent() {
       const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order/${year}/${month}`;
 
       try {
-        const response = await fetch(endpoint);
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(endpoint, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
 
         if (!response.ok) {
           console.error(`HTTP error! Status: ${response.status}, dari ${endpoint}.`);

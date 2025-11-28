@@ -29,10 +29,12 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
     };
 
     try {
+      const token = localStorage.getItem('accessToken');
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(userData),
       });
