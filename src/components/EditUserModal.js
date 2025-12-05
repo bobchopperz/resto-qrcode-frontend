@@ -91,7 +91,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user }) 
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="name">Nama Lengkap</label>
+            <label htmlFor="name">Nama</label>
             <input
               type="text"
               id="name"

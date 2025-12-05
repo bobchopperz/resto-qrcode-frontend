@@ -7,6 +7,7 @@ import styles from './DashboardPage.module.css'; // Import CSS Module
 export default function DashboardPage() {
   const [userName, setUserName] = useState('Kakak'); // Default value
   const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
 
@@ -29,19 +30,27 @@ export default function DashboardPage() {
     const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken = decodeJwt(token);
-      if (decodedToken && decodedToken.name) { // Asumsi nama pengguna ada di properti 'name' dalam payload
+
+      // console.log("Decoded JWT Token:", decodedToken); // whitebox isi JWT token
+
+      if (decodedToken && decodedToken.username) { // ini untuk naman panggilan username di dashboard
+
+        // setUserName(decodedToken.username);
         setUserName(decodedToken.name);
-      } else if (decodedToken && decodedToken.username) { // Fallback ke username jika 'name' tidak ada
-        setUserName(decodedToken.username);
+        setIsAuthorized(true);
       }
     } else {
         router.push('/login');
     }
   }, [router]);
 
+  if(!isAuthorized){
+      return null; // jangan render apapun sebelum authorized
+  }
+
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Selamat Datang, {userName}!</h1>
+      <h1 className={styles.title}>Selamat Datang, {userName}</h1>
       <p className={styles.content}>Ini adalah halaman utama dashboard. Silakan pilih menu di sidebar untuk navigasi.</p>
     </div>
   );

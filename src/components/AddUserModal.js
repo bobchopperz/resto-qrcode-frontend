@@ -92,7 +92,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded }) {
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="name">Nama Lengkap</label>
+            <label htmlFor="name">Nama</label>
             <input
               type="text"
               id="name"
