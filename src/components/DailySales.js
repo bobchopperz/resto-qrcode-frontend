@@ -97,7 +97,9 @@ function DailyDetailModal({ dayData, onClose, onDeleteTransaction }) {
                               {item.nama_menu}
                               {item.opsi_terpilih && item.opsi_terpilih.length > 0 && (
                                 <div className={styles.opsiDetail}>
-                                  {item.opsi_terpilih.map(opsi => opsi.pilihan).join(', ')}
+                                  {item.opsi_terpilih.map((opsi, idx) => (
+                                    <div key={idx}>{`${opsi.nama_opsi} : ${opsi.pilihan}`}</div>
+                                  ))}
                                 </div>
                               )}
                             </td>
