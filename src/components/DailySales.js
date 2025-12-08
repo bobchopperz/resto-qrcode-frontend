@@ -17,13 +17,20 @@ const formatRupiah = (number) => {
 };
 
 // --- Child Component (Modal dengan Accordion) ---
-function DailyDetailModal({ dayData, onClose }) {
+function DailyDetailModal({ dayData, onClose, onDeleteTransaction }) {
   const [openAccordionId, setOpenAccordionId] = useState(null);
 
   if (!dayData) return null;
 
   const handleToggleAccordion = (transactionId) => {
     setOpenAccordionId(currentId => (currentId === transactionId ? null : transactionId));
+  };
+
+  const handleDeleteClick = (transactionId, event) => {
+    event.stopPropagation(); // Mencegah event bubbling ke elemen lain
+    if (window.confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+      onDeleteTransaction(transactionId);
+    }
   };
 
   return (
@@ -48,6 +55,12 @@ function DailyDetailModal({ dayData, onClose }) {
               <div className={styles.transactionActions}>
                 <button className={styles.button} onClick={() => handleToggleAccordion(transaction._id)}>
                   {openAccordionId === transaction._id ? 'Tutup Detail' : 'Lihat Detail Order'}
+                </button>
+                <button
+                  className={`${styles.button} ${styles.deleteButton}`}
+                  onClick={(e) => handleDeleteClick(transaction._id, e)}
+                >
+                  Hapus
                 </button>
               </div>
 
@@ -87,6 +100,9 @@ function DailyDetailModal({ dayData, onClose }) {
         </div>
         <div className={styles.modalFooter}>
           <strong>Total Penjualan Hari Ini: {formatRupiah(dayData.totalSales)}</strong>
+          <strong style={{ display: 'block', marginTop: '0.5rem', color: '#008000' }}>
+            Total Margin Hari Ini: {formatRupiah(dayData.totalMargin)}
+          </strong>
         </div>
       </div>
     </div>
@@ -99,39 +115,41 @@ function DailySalesContent() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [transactions, setTransactions] = useState([]); // State untuk menyimpan data mentah
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    setAggregatedData([]);
+
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth() + 1;
+    const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order/${year}/${month}`;
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(endpoint, {
+          headers: {
+              'Authorization': `Bearer ${token}`,
+          },
+      });
+
+      if (!response.ok) {
+        console.error(`HTTP error! Status: ${response.status}, dari ${endpoint}.`);
+        return;
+      }
+
+      const data = await response.json();
+      setTransactions(data); // Simpan data mentah
+      processAndSetData(data);
+
+    } catch (error) {
+      console.error(`Gagal fetch. Error: ${error.message}`, error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setAggregatedData([]);
-
-      const year = selectedDate.getFullYear();
-      const month = selectedDate.getMonth() + 1;
-      const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order/${year}/${month}`;
-
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(endpoint, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-
-        if (!response.ok) {
-          console.error(`HTTP error! Status: ${response.status}, dari ${endpoint}.`);
-          return;
-        }
-
-        const data = await response.json();
-        processAndSetData(data);
-
-      } catch (error) {
-        console.error(`Gagal fetch. Error: ${error.message}`, error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
   }, [selectedDate]);
 
@@ -164,6 +182,51 @@ function DailySalesContent() {
     }, {});
     const sortedData = Object.values(dailyGroups).sort((a, b) => b.date - a.date);
     setAggregatedData(sortedData);
+  };
+
+  const handleDeleteTransaction = async (transactionId) => {
+    const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/order/${transactionId}`;
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menghapus transaksi.');
+      }
+
+      alert('Transaksi berhasil dihapus.');
+      
+      // Perbarui state setelah penghapusan
+      const updatedTransactions = transactions.filter(t => t._id !== transactionId);
+      setTransactions(updatedTransactions);
+      processAndSetData(updatedTransactions);
+
+      // Tutup modal jika tidak ada lagi transaksi pada hari itu
+      if (selectedDay) {
+        const updatedDayData = {
+          ...selectedDay,
+          transactions: selectedDay.transactions.filter(t => t._id !== transactionId)
+        };
+        if (updatedDayData.transactions.length === 0) {
+          setSelectedDay(null);
+        } else {
+          // Recalculate totals for the modal
+          updatedDayData.totalSales = updatedDayData.transactions.reduce((sum, t) => sum + t.total_jual_keseluruhan, 0);
+          updatedDayData.totalMargin = updatedDayData.transactions.reduce((sum, t) => sum + t.total_margin_keseluruhan, 0);
+          setSelectedDay(updatedDayData);
+        }
+      }
+
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      alert(`Error: ${error.message}`);
+    }
   };
 
   return (
@@ -210,6 +273,7 @@ function DailySalesContent() {
       <DailyDetailModal 
         dayData={selectedDay} 
         onClose={() => setSelectedDay(null)} 
+        onDeleteTransaction={handleDeleteTransaction}
       />
     </div>
   );

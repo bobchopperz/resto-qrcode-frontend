@@ -116,6 +116,15 @@
   background-color: darkblue;
 }
 
+.deleteButton {
+  background-color: #dc3545; /* Warna merah */
+  margin-left: 0.5rem; /* Jarak dari tombol sebelumnya */
+}
+
+.deleteButton:hover {
+  background-color: #c82333; /* Warna merah lebih gelap saat hover */
+}
+
 /* --- Modal Styles --- */
 .dailyModalBackdrop {
   position: fixed;
