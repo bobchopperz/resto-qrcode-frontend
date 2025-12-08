@@ -76,7 +76,7 @@ export default function AddStokModal({ isOpen, onClose, onStokAdded, menuItems }
 
     try {
         const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/stok`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/stok`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
