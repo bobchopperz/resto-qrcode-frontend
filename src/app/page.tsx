@@ -11,37 +11,7 @@ import {
   Plus,
   X,
 } from "lucide-react";
-
-// --- INTERFACES YANG DIPERBARUI ---
-interface Pilihan {
-  pilihan: string;
-  harga_jual: string;
-  modal: string;
-}
-
-interface Opsi {
-  _id: string;
-  nama_opsi: string;
-  list_opsi: Pilihan[]; // Menggunakan interface Pilihan
-}
-
-interface MenuItem {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  stok: number;
-  opsi: Opsi[];
-}
-
-// CartItem sekarang extends MenuItem untuk membawa semua data menu, ditambah quantity dan pilihan_opsi
-interface CartItem extends MenuItem {
-  quantity: number;
-  pilihan_opsi?: { [key: string]: string }; // Hanya menyimpan nama opsi yang dipilih
-  cartItemId: string; // ID unik untuk item di keranjang
-}
-// ---------------------
+import { MenuItem, CartItem } from "./types";
 
 export default function Home() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
@@ -396,7 +366,7 @@ export default function Home() {
               <button
                 onClick={handleSubmitOrder}
                 disabled={isSubmitting}
-                className="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition-colors text-lg disabled:bg-emerald-500 disabled:cursor-not-allowed-400 disabled:cursor-not-allowed"
+                className="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition-colors text-lg disabled:bg-emerald-500 disabled:cursor-not-allowed"
               >
                   {isSubmitting ? 'Loading...' : 'Kirim Pesanan'}
               </button>
