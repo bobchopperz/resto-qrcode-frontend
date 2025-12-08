@@ -16,6 +16,16 @@ const formatRupiah = (number) => {
   }).format(number || 0);
 };
 
+const formatJam = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Jakarta'
+  });
+};
+
 // --- Child Component (Modal dengan Accordion) ---
 function DailyDetailModal({ dayData, onClose, onDeleteTransaction }) {
   const [openAccordionId, setOpenAccordionId] = useState(null);
@@ -45,7 +55,12 @@ function DailyDetailModal({ dayData, onClose, onDeleteTransaction }) {
         <div>
           {dayData.transactions.map(transaction => (
             <div key={transaction._id} className={styles.transactionItem}>
-              <p className={styles.transactionHeader}>Pelanggan : {transaction.nama_pelanggan || 'N/A'}</p>
+              <div className={styles.transactionHeader}>
+                <span>
+                  Pelanggan: <span style={{ fontWeight: 'normal' }}>{transaction.nama_pelanggan || 'N/A'}</span>
+                </span>
+                <span className={styles.orderTime}>Jam : {formatJam(transaction.createdAt)}</span>
+              </div>
               <div className={styles.transactionDetails}>
                 <span><strong>No. WA :</strong> {transaction.no_wa_pelanggan || '-'}</span>
                 <span><strong>Total :</strong> {formatRupiah(transaction.total_jual_keseluruhan)}</span>
@@ -158,6 +173,10 @@ function DailySalesContent() {
       setAggregatedData([]);
       return;
     }
+
+    // Urutkan transaksi berdasarkan waktu (terbaru ke terlama) SEBELUM dikelompokkan
+    transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
     const dailyGroups = transactions.reduce((acc, transaction) => {
       if (!transaction.createdAt) {
         console.warn('Transaksi dilewati karena tidak ada createdAt:', transaction);
