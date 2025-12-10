@@ -63,6 +63,7 @@ function DailyDetailModal({ dayData, onClose, onDeleteTransaction }) {
               </div>
               <div className={styles.transactionDetails}>
                 <span><strong>No. WA :</strong> {transaction.no_wa_pelanggan || '-'}</span>
+                <span><strong>No. Meja :</strong> {transaction.nomor_meja || '-'}</span>
                 <span><strong>Total :</strong> {formatRupiah(transaction.total_jual_keseluruhan)}</span>
                 <span><strong>Modal :</strong> {formatRupiah(transaction.total_modal_keseluruhan)}</span>
                 <span><strong>Margin :</strong> {formatRupiah(transaction.total_margin_keseluruhan)}</span>
