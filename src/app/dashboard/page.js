@@ -52,6 +52,7 @@ export default function DashboardPage() {
     <div className={styles.container}>
       <h1 className={styles.title}>Selamat Datang, {userName}</h1>
       <p className={styles.content}>Ini adalah halaman utama dashboard. Silakan pilih menu di sidebar untuk navigasi.</p>
+
     </div>
   );
 }

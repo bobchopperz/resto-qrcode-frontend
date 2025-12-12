@@ -192,7 +192,13 @@ function DailySalesContent() {
         return acc;
       }
 
-      const dateKey = dateObj.toISOString().split('T')[0];
+      // --- PERBAIKAN: Buat dateKey berdasarkan waktu lokal, bukan UTC ---
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-indexed
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const dateKey = `${year}-${month}-${day}`;
+      // ----------------------------------------------------------------
+
       if (!acc[dateKey]) {
         acc[dateKey] = { date: dateObj, formattedDate: new DateID(dateObj).format('d-MMM-yyyy'), totalSales: 0, totalMargin: 0, totalModal: 0, transactions: [] };
       }
