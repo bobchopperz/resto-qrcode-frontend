@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from 'next/navigation';
 import axios from "axios";
 import Footer from "./components/Footer";
@@ -34,7 +34,12 @@ interface OrderPayload {
 }
 // ------------------------------------
 
-export default function Home() {
+// Memberitahu Next.js untuk tidak membuat halaman ini menjadi statis
+export const dynamic = 'force-dynamic';
+
+// Komponen utama yang berisi semua logika dan tampilan
+// Ini akan di-render di dalam Suspense boundary
+function MenuPage() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
@@ -430,5 +435,17 @@ export default function Home() {
 
       <Footer />
     </div>
+  );
+}
+
+// Komponen Halaman utama yang sekarang berfungsi sebagai "Shell"
+// dengan Suspense boundary
+export default function Home() {
+  return (
+    // Suspense diperlukan saat menggunakan useSearchParams
+    // untuk memberikan fallback UI selagi menunggu data dari URL
+    <Suspense fallback={<div>Loading...</div>}>
+      <MenuPage />
+    </Suspense>
   );
 }
