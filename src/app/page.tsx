@@ -14,6 +14,26 @@ import {
 } from "lucide-react";
 import { MenuItem, CartItem } from "./types";
 
+// --- Tipe untuk Payload Pesanan ---
+interface OpsiTerpilihPayload {
+  nama_opsi: string;
+  pilihan: string;
+}
+
+interface OrderItemPayload {
+  menuId: string;
+  jumlah: number;
+  opsi_terpilih: OpsiTerpilihPayload[];
+}
+
+interface OrderPayload {
+  nama_pelanggan: string;
+  no_wa_pelanggan: string;
+  items: OrderItemPayload[];
+  nomor_meja: string;
+}
+// ------------------------------------
+
 export default function Home() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -141,7 +161,7 @@ export default function Home() {
       };
     });
 
-    const orderData: any = { // Dibuat 'any' untuk fleksibilitas
+    const orderData: OrderPayload = {
       nama_pelanggan: customerName,
       no_wa_pelanggan: formattedWa,
       items: orderItemsPayload,

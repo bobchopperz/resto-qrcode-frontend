@@ -7,7 +7,7 @@ import Image from 'next/image';
 import soupIcon from '../soup.svg'; // Impor ikon SVG
 
 // Ganti dengan URL base backend Anda.
-const API_BASE_URL = 'http://localhost:3001';
+// const API_BASE_URL = 'http://localhost:3001';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
