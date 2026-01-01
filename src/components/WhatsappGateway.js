@@ -8,6 +8,7 @@ export default function WhatsappGateway() {
   const [config, setConfig] = useState({
     'kitchen-forwarding': true,
     'waiter-forwarding': true,
+    'printer-forwarding': true,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -103,6 +104,21 @@ export default function WhatsappGateway() {
               <span className={styles.slider}></span>
             </label>
           </div>
+
+
+          <div className={styles.switchControl}>
+              <span>Printer Forwarding</span>
+              <label className={styles.switch}>
+                  <input
+                      type="checkbox"
+                      name="printer-forwarding"
+                      checked={config['printer-forwarding']}
+                      onChange={handleCheckboxChange}
+                  />
+                  <span className={styles.slider}></span>
+              </label>
+          </div>
+
         </div>
       </div>
 
